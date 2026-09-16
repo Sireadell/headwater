@@ -37,3 +37,23 @@ no mocks, no setup beyond `npm install`, under a minute:
 2. Funding check: were an agent's own reviewers funded by the same
    wallet? Slower (raw log scanning per reviewer), run on a smaller
    sample to stay judge-runnable.
+
+Every real finding gets logged to `data/predictions.json` as an explicit,
+dated claim.
+
+## The scoreboard
+
+```
+node scripts/scoreboard.mjs
+```
+
+Shows the running track record: every claim this tool has made, whether
+it's since been confirmed, refuted, or is still honestly labeled
+`UNVALIDATED` because nothing external exists yet to check it against.
+
+```
+node scripts/generateScoreboardPage.mjs
+```
+
+Regenerates `docs/scoreboard.html`, a static page version of the same
+thing, open it directly in a browser.
