@@ -19,3 +19,13 @@ in the wider hackathons folder for the full build plan.
 ```
 npm test
 ```
+
+## Seeing it work
+
+```
+node scripts/demo.mjs
+```
+
+Finds real registered ERC-8004 agents on Monad mainnet, pulls their real
+public reviews, and checks whether reviewers share a funder. No mocks, no
+setup beyond `npm install`. Takes under 20 seconds.

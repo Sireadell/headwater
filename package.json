@@ -6,5 +6,8 @@
   "description": "Independent funding-provenance audit for ERC-8004 agent reputation on Monad. Monad Metropolis submission.",
   "scripts": {
     "test": "node --test"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0"
   }
 }
