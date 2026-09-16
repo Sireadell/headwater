@@ -11,9 +11,10 @@ reviewer wallet showing up across agents it has no real reason to know,
 one wallet funding many "independent" reviewers, and one relayer paying
 gas for many wallets that each look unrelated on their own.
 
-See `ORIGIN.md` for where the detection code came from and what does and
-does not run on Monad yet. See `hackathons/monad-metropolis/BUILD_PLAN.md`
-in the wider hackathons folder for the full build plan.
+See `HONESTY.md` for exactly what's real, what's simplified and disclosed,
+and what isn't built yet. See `ORIGIN.md` for where the detection code
+came from. See `hackathons/monad-metropolis/BUILD_PLAN.md` in the wider
+hackathons folder for the full build plan.
 
 ## Running the tests
 
