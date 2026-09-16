@@ -12,6 +12,10 @@ export const config = {
     .map((u) => u.trim())
     .filter(Boolean),
   monadMaxLookbackBlocks: Number(process.env.MONAD_MAX_LOOKBACK_BLOCKS) || 50_000,
+  // How many blocks one funder-search "page" covers, see the
+  // PAGE_BLOCK_SPAN comment in core/rpc/monadClient.js. Bigger finds
+  // older funders, slower. Default keeps scripts/demo.mjs fast.
+  monadPageBlockSpan: Number(process.env.MONAD_PAGE_BLOCK_SPAN) || 1_500,
 
   knownExchangeAddresses: (process.env.KNOWN_EXCHANGE_ADDRESSES || '')
     .split(',')

@@ -40,9 +40,9 @@ for (const { agentId } of picked) {
   console.log(`  Agent wallet:        ${r.wallet}`);
   console.log(`  Public review count: ${r.reviewCount}`);
   console.log(`  Average score:       ${r.averageScore}`);
-  console.log(`  Funders found within our lookback window: ${r.fundersFoundInWindow}/${r.reviewCount}`);
+  console.log(`  Funders found in the fast ~22min lookback: ${r.fundersFoundInWindow}/${r.reviewCount}`);
   if (r.fundersOutOfWindow > 0) {
-    console.log(`  (${r.fundersOutOfWindow} reviewer(s) funded before our lookback window, not flagged clean, just not checkable yet)`);
+    console.log(`  (${r.fundersOutOfWindow} reviewer(s) funded earlier than that, not flagged clean, just not checkable at this speed)`);
   }
   if (r.sharedFunders.length > 0) {
     console.log(`  FLAGGED: shared funder(s) across "independent" reviewers:`);
@@ -57,11 +57,16 @@ for (const { agentId } of picked) {
 console.log('\n' + '='.repeat(70));
 console.log(`
 Honest read: this run found no funder-sharing among the reviewers we
-could check, because our current lookback window is bounded to roughly
-the last 4.2 hours of chain history (see src/core/rpc/monadClient.js),
-and these particular reviewer wallets were funded earlier than that. The
-mechanism itself, tracing a reviewer's funder and comparing it across an
-agent's other reviewers, is real and running against live Monad mainnet
-data right now, not simulated. Full chain history requires an indexer
-(Envio, phase 3 of BUILD_PLAN.md), not per-request log scanning.
+could check, because a fast, judge-runnable default only reaches back
+roughly 22 minutes of chain history per wallet (3 pages of raw log
+scanning, see the PAGE_BLOCK_SPAN comment in src/core/rpc/monadClient.js
+for why), and these particular reviewer wallets were funded earlier than
+that. The mechanism itself, tracing a reviewer's funder and comparing it
+across an agent's other reviewers, is real and running against live
+Monad mainnet data right now, not simulated. Reaching further back per
+wallet is possible today by raising MONAD_PAGE_BLOCK_SPAN, at the cost of
+real time per wallet (roughly 33s per wallet at a 5,000-block span,
+confirmed live); a fast default and a full-history search are a genuine
+speed/depth tradeoff until phase 3 brings in an indexer (Envio), which
+answers this without per-request log scanning at all.
 `);

@@ -43,12 +43,22 @@ export async function analyzeAgent(agentId) {
     readAllFeedback(agentId, reviewers),
   ]);
 
-  const reviewerFunding = await Promise.all(
-    reviewers.map(async (reviewer) => {
+  // Each findDirectFunder call already fires several concurrent
+  // eth_getLogs requests internally (see monadClient.js). Running every
+  // reviewer's lookup in parallel on top of that stacked enough load to
+  // trip Monad's public RPC rate limit, confirmed live 2026-09-16. Two
+  // reviewers at a time keeps real concurrency without needing to touch
+  // the retry/backoff already in monadClient.js.
+  const REVIEWER_CONCURRENCY = 2;
+  const reviewerFunding = [];
+  for (let i = 0; i < reviewers.length; i += REVIEWER_CONCURRENCY) {
+    const batch = reviewers.slice(i, i + REVIEWER_CONCURRENCY);
+    const results = await Promise.all(batch.map(async (reviewer) => {
       const evidence = await findDirectFunder(reviewer, {});
       return { reviewer, funder: evidence?.asset?.from ?? null, evidence };
-    })
-  );
+    }));
+    reviewerFunding.push(...results);
+  }
 
   const funderCounts = new Map();
   for (const { funder } of reviewerFunding) {

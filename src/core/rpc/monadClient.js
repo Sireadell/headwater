@@ -66,8 +66,36 @@ const MONAD_RPC_URLS = (config.monadRpcUrls ?? [
   'https://rpc3.monad.xyz',
 ]).filter(Boolean);
 
-const BLOCK_WINDOW = 100; // safe on every public Monad RPC endpoint
+const BLOCK_WINDOW = 100; // safe on every public Monad RPC endpoint, this is a per-RPC-call cap, not a page size
 const MAX_LOOKBACK_BLOCKS = config.monadMaxLookbackBlocks ?? 50_000; // ~4.2 hours at 0.3s blocks
+
+// fundingRelationship.js (unmodified, shared across every chain this
+// codebase supports) hard-caps pagination at 3 pages, a limit sized for
+// Ankr's Advanced API, where one page can return a large batch of
+// transfers already sorted. On Monad, one page is a raw eth_getLogs scan,
+// and if a page were only BLOCK_WINDOW (100) blocks wide, 3 pages would
+// cover 300 of MAX_LOOKBACK_BLOCKS's 50,000 blocks, under 1% of the
+// lookback window. Confirmed live 2026-09-16: every funder search in
+// phase 2's first real run came back empty because of exactly this, not
+// because funding was necessarily too old to find.
+//
+// Fixed at this layer, not by touching fundingRelationship.js's page
+// count: one logical "page" here covers PAGE_BLOCK_SPAN blocks, scanned
+// as many BLOCK_WINDOW-sized eth_getLogs calls run with bounded
+// concurrency. 3 default pages now cover 3 * PAGE_BLOCK_SPAN blocks
+// instead of 3 * BLOCK_WINDOW.
+// 5,000 was tried first (a real 50x improvement over the original
+// 100-block page) but took ~33s for a single wallet's default 3-page
+// scan, confirmed live 2026-09-16, too slow to keep scripts/demo.mjs's
+// judge-runnable proof under 90 seconds once multiple reviewer wallets
+// are checked. 1,500 is a real, smaller improvement (15x) that keeps the
+// demo fast; set MONAD_PAGE_BLOCK_SPAN higher for a slower, deeper
+// one-off lookup outside the demo path.
+const PAGE_BLOCK_SPAN = config.monadPageBlockSpan ?? 1_500;
+// Lowered from 10 after a live 429 from rpc1.monad.xyz at that
+// concurrency, confirmed 2026-09-16. rawRpc() also retries a 429 with
+// backoff (see below), so this is a soft ceiling, not the only defense.
+const SUBSCAN_CONCURRENCY = 3;
 
 export class MonadRpcError extends Error {
   constructor(message) {
@@ -83,13 +111,24 @@ function nextRpcUrl() {
   return url;
 }
 
-async function rawRpc(method, params) {
+const RATE_LIMIT_RETRIES = 5;
+
+async function rawRpc(method, params, attempt = 0) {
   const url = nextRpcUrl();
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
   });
+  // Hit live 2026-09-16 once PAGE_BLOCK_SPAN widened real requests per
+  // findDirectFunder call from ~2 to ~100+. A short backoff and retry on
+  // a different round-robin endpoint clears it in practice; only give up
+  // after RATE_LIMIT_RETRIES, so a genuinely down endpoint still fails
+  // loudly instead of retrying forever.
+  if (res.status === 429 && attempt < RATE_LIMIT_RETRIES) {
+    await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** attempt));
+    return rawRpc(method, params, attempt + 1);
+  }
   if (!res.ok) {
     throw new MonadRpcError(`Monad RPC HTTP ${res.status} from ${url}`);
   }
@@ -145,41 +184,63 @@ function decodeTransferLog(log, token, blockTimestampMs) {
  * pageToken encodes { fromBlock, toBlock } for the NEXT window to scan,
  * base64-encoded JSON, opaque to the caller exactly like Ankr's token.
  */
+async function scanOneSubWindow(wallet, token, subFrom, subTo) {
+  const walletTopic = addressToTopic(wallet);
+  const [outgoing, incoming] = await Promise.all([
+    rawRpc('eth_getLogs', [{
+      address: token.address,
+      fromBlock: '0x' + subFrom.toString(16),
+      toBlock: '0x' + subTo.toString(16),
+      topics: [TRANSFER_TOPIC, walletTopic],
+    }]),
+    rawRpc('eth_getLogs', [{
+      address: token.address,
+      fromBlock: '0x' + subFrom.toString(16),
+      toBlock: '0x' + subTo.toString(16),
+      topics: [TRANSFER_TOPIC, null, walletTopic],
+    }]),
+  ]);
+  return [...outgoing, ...incoming];
+}
+
+/**
+ * Run eth_getLogs sub-window scans with a concurrency cap instead of all
+ * at once, so a single page (PAGE_BLOCK_SPAN blocks, up to 50 sub-windows
+ * at the default span) doesn't fire an unbounded burst of requests at a
+ * public RPC endpoint.
+ */
+async function scanWithConcurrencyLimit(jobs, limit) {
+  const results = [];
+  for (let i = 0; i < jobs.length; i += limit) {
+    const batch = jobs.slice(i, i + limit);
+    results.push(...await Promise.all(batch.map((job) => job())));
+  }
+  return results;
+}
+
 async function fetchTokenTransfers(wallet, { pageToken } = {}) {
   const tip = await currentBlockNumber();
   const lowestAllowed = Math.max(0, tip - MAX_LOOKBACK_BLOCKS);
 
-  let toBlock;
-  let fromBlock;
+  let pageStart;
   if (pageToken) {
     const decoded = JSON.parse(Buffer.from(pageToken, 'base64url').toString('utf8'));
-    toBlock = decoded.toBlock;
+    pageStart = decoded.toBlock;
   } else {
-    toBlock = lowestAllowed; // start at the OLD end of the window, walk forward (oldest-first)
+    pageStart = lowestAllowed; // start at the OLD end of the window, walk forward (oldest-first)
   }
-  fromBlock = toBlock;
-  const windowEnd = Math.min(fromBlock + BLOCK_WINDOW - 1, tip);
+  const pageEnd = Math.min(pageStart + PAGE_BLOCK_SPAN - 1, tip);
 
-  const walletTopic = addressToTopic(wallet);
+  const subWindows = [];
+  for (let subFrom = pageStart; subFrom <= pageEnd; subFrom += BLOCK_WINDOW) {
+    subWindows.push([subFrom, Math.min(subFrom + BLOCK_WINDOW - 1, pageEnd)]);
+  }
+
   const items = [];
-
   for (const token of Object.values(TRACKED_TOKENS)) {
-    const [outgoing, incoming] = await Promise.all([
-      rawRpc('eth_getLogs', [{
-        address: token.address,
-        fromBlock: '0x' + fromBlock.toString(16),
-        toBlock: '0x' + windowEnd.toString(16),
-        topics: [TRANSFER_TOPIC, walletTopic],
-      }]),
-      rawRpc('eth_getLogs', [{
-        address: token.address,
-        fromBlock: '0x' + fromBlock.toString(16),
-        toBlock: '0x' + windowEnd.toString(16),
-        topics: [TRANSFER_TOPIC, null, walletTopic],
-      }]),
-    ]);
-
-    const logs = [...outgoing, ...incoming];
+    const jobs = subWindows.map(([subFrom, subTo]) => () => scanOneSubWindow(wallet, token, subFrom, subTo));
+    const logsPerWindow = await scanWithConcurrencyLimit(jobs, SUBSCAN_CONCURRENCY);
+    const logs = logsPerWindow.flat();
     if (logs.length === 0) continue;
 
     const blockNumbers = [...new Set(logs.map((l) => parseInt(l.blockNumber, 16)))];
@@ -191,7 +252,7 @@ async function fetchTokenTransfers(wallet, { pageToken } = {}) {
     }
   }
 
-  const nextFrom = windowEnd + 1;
+  const nextFrom = pageEnd + 1;
   const exhausted = nextFrom > tip;
   const nextPageToken = exhausted
     ? undefined
@@ -202,7 +263,7 @@ async function fetchTokenTransfers(wallet, { pageToken } = {}) {
     nextPageToken,
     // Signal to the caller when the window ran out before a full walk
     // completed, distinct from "no more pages because we're done".
-    _lookbackExhausted: exhausted && !pageToken && fromBlock === lowestAllowed
+    _lookbackExhausted: exhausted && !pageToken && pageStart === lowestAllowed
       ? false // first page reaching tip in one shot is a genuine complete walk
       : exhausted,
   };
