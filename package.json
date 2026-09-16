@@ -1,0 +1,10 @@
+{
+  "name": "headwater",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent funding-provenance audit for ERC-8004 agent reputation on Monad. Monad Metropolis submission.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
