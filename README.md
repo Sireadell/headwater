@@ -6,9 +6,10 @@ Monad. Monad Metropolis submission.
 An empirical study of ERC-8004 across Ethereum, BSC and Base found most
 reviewer activity was Sybil-coordinated, not real. The one live tool that
 screens for this scores by reviewer wallet age. Age is easy to fake, and
-it structurally misses the two patterns Headwater looks for: one wallet
-funding many "independent" reviewers, and one relayer paying gas for many
-wallets that each look unrelated on their own.
+it structurally misses the patterns Headwater looks for: the same
+reviewer wallet showing up across agents it has no real reason to know,
+one wallet funding many "independent" reviewers, and one relayer paying
+gas for many wallets that each look unrelated on their own.
 
 See `ORIGIN.md` for where the detection code came from and what does and
 does not run on Monad yet. See `hackathons/monad-metropolis/BUILD_PLAN.md`
@@ -26,6 +27,13 @@ npm test
 node scripts/demo.mjs
 ```
 
-Finds real registered ERC-8004 agents on Monad mainnet, pulls their real
-public reviews, and checks whether reviewers share a funder. No mocks, no
-setup beyond `npm install`. Takes under 20 seconds.
+Runs two checks against real registered ERC-8004 agents on Monad mainnet,
+no mocks, no setup beyond `npm install`, under a minute:
+
+1. Cross-agent review overlap: does the same reviewer wallet show up on
+   more than one agent? Registry data only, no chain scanning, fast. On
+   the first live run this caught five different reviewer wallets all
+   clustered around reviewing the exact same six agents.
+2. Funding check: were an agent's own reviewers funded by the same
+   wallet? Slower (raw log scanning per reviewer), run on a smaller
+   sample to stay judge-runnable.
