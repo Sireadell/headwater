@@ -1,0 +1,29 @@
+[
+  {
+    "id": "CROSS_AGENT_REVIEW_CLUSTER:153,154,155,156,157,158",
+    "signalCode": "CROSS_AGENT_REVIEW_CLUSTER",
+    "claim": "Agents 153,154,155,156,157,158 are reviewed by the same cluster of 4 wallets and no others in the scanned range, consistent with coordinated review activity rather than independent users.",
+    "subject": "153,154,155,156,157,158",
+    "evidence": {
+      "agentIds": [
+        153,
+        154,
+        155,
+        156,
+        157,
+        158
+      ],
+      "reviewers": [
+        "0xE05544220998684540be9DC8859bE9954A6E3B6a",
+        "0xb08e06cF59EDB3aF1Cbf15EBB4EcE9c65876D91a",
+        "0x69F86818e82B023876c2b87Ab0428dc38933897d",
+        "0xC5058a75A5E7124F3dB5657C635EB7c3b8C84A3D"
+      ]
+    },
+    "madeAt": "2026-09-16T16:52:19.516Z",
+    "status": "UNVALIDATED",
+    "reason": "no_outside_check_available_yet",
+    "validatedAt": null,
+    "validationNote": null
+  }
+]

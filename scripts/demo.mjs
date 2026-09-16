@@ -14,6 +14,7 @@
 
 import { analyzeAgent } from '../src/analyzeAgent.js';
 import { findCrossAgentReviewOverlap } from '../src/crossAgentReviewOverlap.js';
+import { recordPrediction } from '../src/scoreboard.js';
 
 const AGENT_SCAN_LIMIT = 250;
 const AGENTS_TO_FUNDING_CHECK = 3;
@@ -47,6 +48,14 @@ if (overlaps.length === 0) {
     console.log(`  set of agents (${agentIdList}). One wallet reviewing several agents could be a real`);
     console.log(`  user; several different wallets all clustered around the same agents is the`);
     console.log(`  coordinated-review pattern this product exists to catch.`);
+
+    await recordPrediction({
+      signalCode: 'CROSS_AGENT_REVIEW_CLUSTER',
+      subject: agentIdList,
+      claim: `Agents ${agentIdList} are reviewed by the same cluster of ${reviewers.length} wallets and no others in the scanned range, consistent with coordinated review activity rather than independent users.`,
+      evidence: { agentIds: agentIdList.split(',').map(Number), reviewers },
+    });
+    console.log(`  Logged to the scoreboard (run: node scripts/scoreboard.mjs).`);
   }
 }
 
@@ -68,7 +77,14 @@ for (const { agentId } of picked) {
     console.log(`  FLAGGED: shared funder(s) across "independent" reviewers:`);
     for (const sf of r.sharedFunders) {
       console.log(`    ${sf.funder} funded ${sf.reviewerCount} of this agent's reviewers`);
+      await recordPrediction({
+        signalCode: 'SHARED_REVIEWER_FUNDER',
+        subject: `agent-${r.agentId}:${sf.funder}`,
+        claim: `Agent ${r.agentId}: wallet ${sf.funder} funded ${sf.reviewerCount} of its reviewers, consistent with those reviews not being independent.`,
+        evidence: { agentId: r.agentId, funder: sf.funder, reviewerCount: sf.reviewerCount },
+      });
     }
+    console.log(`  Logged to the scoreboard (run: node scripts/scoreboard.mjs).`);
   } else {
     console.log(`  No shared funder found among reviewers checkable in this window.`);
   }
