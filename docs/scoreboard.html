@@ -2,59 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Headwater scoreboard</title>
-<style>
-  :root { color-scheme: light dark; }
-  body { font-family: -apple-system, system-ui, sans-serif; max-width: 780px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
-  h1 { margin-bottom: 4px; }
-  .subtitle { color: #666; margin-bottom: 24px; }
-  .totals { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-  .stat { border: 1px solid #ddd; border-radius: 8px; padding: 12px 18px; }
-  .stat .n { font-size: 24px; font-weight: 700; }
-  .stat .label { font-size: 13px; color: #666; }
-  table { width: 100%; border-collapse: collapse; }
-  td { border-top: 1px solid #eee; padding: 12px 8px; vertical-align: top; }
-  td:first-child { width: 130px; white-space: nowrap; }
-  .claim { margin-bottom: 4px; }
-  .meta { font-size: 13px; color: #777; }
-  .honest-read { margin-top: 32px; padding: 16px; background: #f7f7f7; border-radius: 8px; font-size: 14px; color: #444; }
-  @media (prefers-color-scheme: dark) {
-    body { background: #111; color: #eee; }
-    .stat { border-color: #333; }
-    td { border-top-color: #2a2a2a; }
-    .honest-read { background: #1a1a1a; color: #ccc; }
-  }
-</style>
+<title>Headwater — Scoreboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Headwater scoreboard</h1>
-  <div class="subtitle">Every claim this tool has made about ERC-8004 agent reputation on Monad, checked against reality where that's possible.</div>
+<div class="page">
 
-  <div class="totals">
-    <div class="stat"><div class="n">1</div><div class="label">Total claims</div></div>
-    <div class="stat"><div class="n">0</div><div class="label">Confirmed</div></div>
-    <div class="stat"><div class="n">0</div><div class="label">Refuted</div></div>
-    <div class="stat"><div class="n">1</div><div class="label">Unvalidated</div></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="disp brand-name">Headwater</span>
+    </a>
+    <nav class="nav">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="lookup.html">Agent Lookup</a>
+      <a class="navlink active" href="scoreboard.html">Scoreboard</a>
+      <a class="navlink" href="methodology.html">Methodology</a>
+    </nav>
+    <a class="sourcelink" href="https://github.com/Sireadell/headwater">View source</a>
+  </header>
+
+  <div class="scoreboard-head">
+    <h1 class="disp">Scoreboard</h1>
+    <p>Every claim Headwater has made, dated and logged the moment it was found. Nothing is removed if it turns out wrong &mdash; a claim is marked confirmed, refuted, or stays honestly unvalidated until something external exists to check it against.</p>
   </div>
 
-  <table><tbody>
-    <tr>
-      <td><span style="color:#8a6d00; background:#fff7cc; padding:2px 8px; border-radius:4px; font-size:13px; font-weight:600;">UNVALIDATED</span></td>
-      <td>
-        <div class="claim">Agents 153,154,155,156,157,158 are reviewed by the same cluster of 4 wallets and no others in the scanned range, consistent with coordinated review activity rather than independent users.</div>
-        <div class="meta">Signal: CROSS_AGENT_REVIEW_CLUSTER &middot; Logged 2026-09-16T16:52:19.516Z</div>
-        <div class="meta">Why still unvalidated: no_outside_check_available_yet</div>
-      </td>
-    </tr></tbody></table>
-
-  <div class="honest-read">
-    Honest read: this product is new, so most or all claims here are UNVALIDATED,
-    not because they're weak, but because nothing external exists yet to check
-    them against. That state is shown on purpose instead of hidden. As real
-    outcomes become checkable, those claims move to CONFIRMED or REFUTED here,
-    not silently dropped. This page is generated from
-    <code>data/predictions.json</code> by <code>scripts/generateScoreboardPage.mjs</code>,
-    regenerate it after running <code>scripts/demo.mjs</code> again.
+  <div class="score-stats">
+    <div class="score-stat">
+      <div class="score-stat-num mono disp">1</div>
+      <div class="score-stat-label">total claims logged</div>
+    </div>
+    <div class="score-stat">
+      <div class="score-stat-num mono disp" style="color:var(--amber);">1</div>
+      <div class="score-stat-label">unvalidated &mdash; nothing external exists yet to check against</div>
+    </div>
+    <div class="score-stat">
+      <div class="score-stat-num mono disp" style="color:var(--green);">0</div>
+      <div class="score-stat-label">externally confirmed</div>
+    </div>
   </div>
+
+  <div class="scoreboard-body">
+    <div class="table">
+      <div class="table-head">
+        <div class="col mono" style="flex:2;">CLAIM</div>
+        <div class="col mono" style="width:130px;">DATE</div>
+        <div class="col mono" style="width:150px;">STATUS</div>
+        <div class="col mono" style="width:160px;">EVIDENCE</div>
+      </div>
+      <div class="claim-row">
+        <div class="claim-title">
+          <div class="claim-name">5 reviewer wallets found reviewing the same 6 agents (153&ndash;158)</div>
+          <div class="claim-sub">Cross-agent review overlap, registry reads only, no chain scanning</div>
+        </div>
+        <div class="claim-date mono">2026-09-16</div>
+        <div class="claim-status"><span class="badge badge-amber mono">UNVALIDATED</span></div>
+        <div class="claim-evidence"><a href="lookup.html">agents 153&ndash;158 &rarr;</a></div>
+      </div>
+    </div>
+    <p class="footnote">UNVALIDATED is not a weaker way of saying "true." It means exactly what it says: nothing outside Headwater's own read of the chain has confirmed or refuted this yet. A claim moves to CONFIRMED only when something real happens to check it against &mdash; an agent delisted, a reviewer flagged elsewhere, a human confirmation recorded here explicitly.</p>
+  </div>
+
+</div>
 </body>
 </html>

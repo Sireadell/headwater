@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Headwater — Home</title>
+<meta name="description" content="Independent funding-provenance audit for ERC-8004 agent reputation on Monad.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="disp brand-name">Headwater</span>
+    </a>
+    <nav class="nav">
+      <a class="navlink active" href="index.html">Home</a>
+      <a class="navlink" href="lookup.html">Agent Lookup</a>
+      <a class="navlink" href="scoreboard.html">Scoreboard</a>
+      <a class="navlink" href="methodology.html">Methodology</a>
+    </nav>
+    <a class="sourcelink" href="https://github.com/Sireadell/headwater">View source</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow mono">Independent funding-provenance audit &middot; ERC-8004 on Monad</div>
+      <h1 class="disp hero-title">Reviews can be faked. Money can&rsquo;t lie as easily.</h1>
+      <p class="hero-sub">An empirical study of ERC-8004 across Ethereum, BSC and Base found most reviewer activity was Sybil-coordinated, not real. Headwater traces who actually funded whom &mdash; not just who left a review &mdash; to catch the pattern the current wallet-age screen structurally misses.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="lookup.html">Look up an agent</a>
+        <a class="btn btn-ghost" href="methodology.html">Read the honesty table</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-num mono disp">250+</div>
+      <div class="stat-label">registered agents scanned live on Monad mainnet</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num mono disp">3</div>
+      <div class="stat-label">detection signals live: cross-agent overlap, circular funding, funder fan-out</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num mono disp">~5.2M</div>
+      <div class="stat-label">blocks of AUSD funding history indexed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num mono disp">1</div>
+      <div class="stat-label">real coordinated cluster, found live</div>
+    </div>
+  </section>
+
+  <section class="finding">
+    <div class="finding-head">
+      <h2 class="disp">Live finding &mdash; agents 153&ndash;158</h2>
+      <a href="lookup.html">Inspect this cluster &rarr;</a>
+    </div>
+    <div class="table">
+      <div class="table-head">
+        <div class="col col-wallet mono">REVIEWER WALLET</div>
+        <div class="col col-agents mono">AGENTS REVIEWED</div>
+        <div class="col col-signal mono">SIGNAL</div>
+      </div>
+      <div class="table-row">
+        <div class="col col-wallet mono">0x4a91...e2c7</div>
+        <div class="col col-agents mono">Agents 153, 155, 156</div>
+        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+      </div>
+      <div class="table-row">
+        <div class="col col-wallet mono">0x8f03...9b14</div>
+        <div class="col col-agents mono">Agents 153, 154, 157</div>
+        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+      </div>
+      <div class="table-row">
+        <div class="col col-wallet mono">0x2c6e...a071</div>
+        <div class="col col-agents mono">Agents 154, 156, 158</div>
+        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+      </div>
+      <div class="table-row">
+        <div class="col col-wallet mono">0x71bd...3f42</div>
+        <div class="col col-agents mono">Agents 155, 157, 158</div>
+        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+      </div>
+      <div class="table-row">
+        <div class="col col-wallet mono">0xd928...c6e0</div>
+        <div class="col col-agents mono">Agents 153, 156, 158</div>
+        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+      </div>
+    </div>
+    <p class="footnote">Observed live on Monad mainnet, 2026-09-16. Cross-agent overlap alone is not proof of fraud &mdash; a real user can legitimately review several products. See Methodology for what this signal does and does not establish on its own.</p>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Headwater — Methodology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="disp brand-name">Headwater</span>
+    </a>
+    <nav class="nav">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="lookup.html">Agent Lookup</a>
+      <a class="navlink" href="scoreboard.html">Scoreboard</a>
+      <a class="navlink active" href="methodology.html">Methodology</a>
+    </nav>
+    <a class="sourcelink" href="https://github.com/Sireadell/headwater">View source</a>
+  </header>
+
+  <div class="method-head">
+    <h1 class="disp">Honesty table</h1>
+    <p>What&rsquo;s real, what&rsquo;s simplified and disclosed, and what isn&rsquo;t built yet. Plain statements, checkable in the code itself, not buried in comments.</p>
+  </div>
+
+  <div class="method-body">
+
+    <div>
+      <div class="method-section-title">
+        <div class="method-dot" style="background:var(--green);"></div>
+        <span class="disp" style="font-size:14px;font-weight:600;">Real</span>
+      </div>
+      <div class="method-list">
+        <div class="method-row">
+          <div class="method-label">ERC-8004 registry reads</div>
+          <div class="method-desc">Calls the actual Identity and Reputation registries live on Monad mainnet. Function signatures pulled from the reference contracts, not the spec doc.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">Funding-provenance signal</div>
+          <div class="method-desc">Reads real Monad AUSD transfer events, verified against real wallets and real on-chain transactions.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">9 detection signals</div>
+          <div class="method-desc">106 automated tests passing, covering every funding-relationship and reputation-overlap check the tool runs.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="method-section-title">
+        <div class="method-dot" style="background:var(--amber);"></div>
+        <span class="disp" style="font-size:14px;font-weight:600;">Simplified, disclosed not hidden</span>
+      </div>
+      <div class="method-list">
+        <div class="method-row">
+          <div class="method-label">Token coverage</div>
+          <div class="method-desc">Tracks AUSD, the stablecoin real agents use to pay each other on Monad today. Native MON transfers are not yet indexed &mdash; a funder paying in native MON is currently invisible to this tool.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="method-section-title">
+        <div class="method-dot" style="background:var(--text-mut);"></div>
+        <span class="disp" style="font-size:14px;font-weight:600;">Not built yet</span>
+      </div>
+      <div class="method-list">
+        <div class="method-row">
+          <div class="method-label">Agent Wallet hook</div>
+          <div class="method-desc">The gap it would fill is real and documented, but no code exists for it yet. This is what would make Headwater infrastructure other apps call, not a standalone checker.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">Registering Headwater as a listed agent</div>
+          <div class="method-desc">Requires a funded wallet and a live on-chain transaction. Not registered yet.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Headwater — Agent Lookup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="mark"></span>
+      <span class="disp brand-name">Headwater</span>
+    </a>
+    <nav class="nav">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink active" href="lookup.html">Agent Lookup</a>
+      <a class="navlink" href="scoreboard.html">Scoreboard</a>
+      <a class="navlink" href="methodology.html">Methodology</a>
+    </nav>
+    <a class="sourcelink" href="https://github.com/Sireadell/headwater">View source</a>
+  </header>
+
+  <form class="lookup-form" onsubmit="return false;">
+    <label class="lookup-label mono" for="agentId">Agent ID (ERC-8004 identity registry)</label>
+    <div class="lookup-row">
+      <input id="agentId" type="text" value="153">
+      <button id="checkBtn" type="button">Check</button>
+    </div>
+    <p class="lookup-help">Reads live from the Identity and Reputation registries at 0x8004A169... and 0x8004BAa1... on Monad mainnet, cross-referenced against Envio-indexed AUSD funding history and Nansen wallet labels.</p>
+  </form>
+
+  <div id="results"></div>
+
+</div>
+<script src="config.js"></script>
+<script src="lookup.js"></script>
+</body>
+</html>
