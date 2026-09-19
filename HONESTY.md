@@ -22,7 +22,7 @@ plain statements, not buried in comments, checkable in the code itself.
 
 | Piece | The real limit | Why it's an acceptable simplification for now |
 |---|---|---|
-| Funding lookback window | Fast default only reaches ~22 minutes of chain history per wallet (3 pages × 1,500 blocks of raw log scanning). A deeper, slower search is available via `MONAD_PAGE_BLOCK_SPAN` (confirmed live: ~33s per wallet at 5,000 blocks). | Full chain history without this tradeoff needs an indexer (Envio, phase 3), blocked on an account signup, not a code problem. The mechanism is real; only its reach is bounded right now. |
+| Funding lookback window | This repo's own direct RPC scan still only reaches ~22 minutes of chain history per wallet (3 pages × 1,500 blocks). **Superseded, not just planned:** a separate, real Envio HyperIndex deployment at [`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer) now indexes AUSD funding transfers back ~101M blocks (~100x deeper), plus computes circular-funding and funder-fan-out as live, continuously-updated entities -- see that repo's README for the live GraphQL endpoint and schema. |
 | Token coverage | Only AUSD is tracked (`TRACKED_TOKENS` in `monadClient.js`), not every ERC-20 a wallet has touched. | An unbounded per-wallet token scan on Monad is the kind of query that made a similar project's backfill cost $990/month elsewhere (see `BUILD_PLAN.md`). A named, confirmed-live allowlist keeps every query scoped and fast; extend only after confirming a new token live, same as AUSD was. |
 | Native MON transfers | Not tracked. `callMonad('monad_getTransactionsByAddress', ...)` returns an empty, honestly-flagged result (`_nativeTransferHistoryUnavailable: true`) rather than guessing. | Native transfers don't emit logs, reading them needs trace data. Envio has Monad traces (confirmed live), wiring that in is phase 3. |
 | `liveSolvencyRisk` (Aave v3) | Correctly does nothing on Monad. It's hardcoded to Ethereum mainnet's real Aave v3 contract; there's no Monad equivalent wired in. | Copied code from telegraph-sentinel is Ethereum-only by design; it declines rather than guesses at a Monad answer it doesn't have. |
@@ -32,8 +32,8 @@ plain statements, not buried in comments, checkable in the code itself.
 
 | Piece | Why |
 |---|---|
-| Envio integration (phase 3) | Needs a free API token, an account signup only the project owner can do. Not a code blocker. |
-| Nansen second-opinion check (phase 3) | Same, needs an account signup. |
+| ~~Envio integration (phase 3)~~ | **Done, 2026-09-19.** Deployed to Envio Cloud as a separate repo, [`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer). See that repo's README and HONESTY-equivalent notes for what's real there. |
+| ~~Nansen second-opinion check (phase 3)~~ | **Done, 2026-09-19**, same repo. Wallets flagged by circular-funding or fan-out are screened against Nansen; known-legitimate categories (exchange, market-maker, liquidity pool, institutional) are filtered out rather than flagged. |
 | MetaMask Agent Wallet hook (phase 5) | Not started. The gap it would fill is real and documented (their own security pipeline never checks whether the *other* agent being paid is real), but no code exists for it yet. |
 | Registering Headwater itself as a listed ERC-8004 agent | A real transaction, needs gas and a wallet. Deliberately not done without the project owner's go-ahead; asked, not yet actioned. |
 | `gasSponsor` wired into a live ERC-8004 check | The signal itself is real and tested (copied from PulseVerify, its own test suite passes), but nothing in this build calls it against real ERC-8004 data yet. The contract's `giveFeedback` always uses the caller's own address as the reviewer, so this signal's real use here (catching a sponsored relayer hiding behind many "clean" wallets) needs a concrete on-chain case to target, not yet found. |

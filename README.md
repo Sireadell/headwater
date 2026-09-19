@@ -16,6 +16,16 @@ and what isn't built yet. See `ORIGIN.md` for where the detection code
 came from. See `hackathons/monad-metropolis/BUILD_PLAN.md` in the wider
 hackathons folder for the full build plan.
 
+## Live indexer (Envio + Nansen)
+
+Full chain-history funding data, plus live circular-funding and funder
+fan-out detection, run as a separate deployed service:
+[`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer)
+on Envio Cloud. That repo's `config.yaml` and `schema.graphql` are the
+source of truth for what's actually indexed; this repo's own
+`monadClient.js` (bounded, ~22-minute lookback) still runs independently
+as the fast-path fallback.
+
 ## Running the tests
 
 ```
