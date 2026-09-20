@@ -19,11 +19,13 @@ hackathons folder for the full build plan.
 ## Live indexer (Envio + Nansen)
 
 A separate deployed service, [`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer)
-on Envio Cloud, indexes AUSD funding transfers back roughly 5.2 million
+on Envio Cloud, indexes AUSD funding transfers back roughly 300,000
 blocks (not full chain history -- bounded on purpose, see that repo's
-`config.yaml` for why), about 100x deeper than this repo's own
-`monadClient.js` fast-path (~50,000-block / ~4.2-hour default cap, which
-still runs independently as the fallback). It also computes circular
+`config.yaml` for why: a wider window exceeded Envio Cloud's free-tier
+event quota, since AUSD settles activity across all of Monad, not just
+agent wallets), about 6x deeper than this repo's own `monadClient.js`
+fast-path (~50,000-block / ~4.2-hour default cap, which still runs
+independently as the fallback). It also computes circular
 funding and funder fan-out as live, continuously-updated entities, and
 cross-checks flagged wallets against Nansen. That repo's `config.yaml` and
 `schema.graphql` are the source of truth for exactly what's indexed.
