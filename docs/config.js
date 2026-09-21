@@ -2,4 +2,4 @@
 // on the deployment's detail page under "Endpoints" -> "Deployment Endpoint".
 // Until it's set, the Lookup page runs in a clearly-labeled offline state
 // instead of failing silently.
-const GRAPHQL_ENDPOINT = "";
+const GRAPHQL_ENDPOINT = "https://indexer.dev.hyperindex.xyz/b2c0396/v1/graphql";
