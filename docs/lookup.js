@@ -97,6 +97,16 @@ const SIGNAL_FRAGMENTS = {
     source
     isDust
   }`,
+  // Needed to tell a coordinator from a faucet. One live Monad wallet has
+  // funded nearly two thousand reviewers; from a single agent's handful of
+  // wallets it is indistinguishable from an operator, so the global count
+  // has to come from the indexer.
+  FunderProfile: `
+  FunderProfile(where: { distributorShaped: { _eq: true } }, limit: 500) {
+    id
+    funder
+    distinctWalletsFunded
+  }`,
   ReviewCadence: `
   ReviewCadence(where: { agent_id: { _eq: $agentId }, automationSuspected: { _eq: true } }) {
     id
@@ -254,9 +264,16 @@ function renderAgent(agentId, agent, walletDetail) {
   // a gas top-up is not the same relationship as capitalising a wallet,
   // and conflating them was a live-caught mistake in an earlier project.
   const funderRows = walletDetail.WalletFunder || [];
+  // Faucets and distributors pay thousands of unrelated wallets. Including
+  // them would flag every agent on the chain, which reads as a working
+  // signal while being meaningless.
+  const distributors = new Set(
+    (walletDetail.FunderProfile || []).map((p) => p.funder),
+  );
   const walletsByFunder = {};
   for (const row of funderRows) {
     if (row.isDust) continue;
+    if (distributors.has(row.funder)) continue;
     (walletsByFunder[row.funder] ||= new Set()).add(row.wallet);
   }
   const sharedOrigins = Object.entries(walletsByFunder)
@@ -320,8 +337,8 @@ function renderAgent(agentId, agent, walletDetail) {
                 (o) =>
                   `${shortAddr(o.funder)} paid ${o.wallets.length} of the wallets behind this agent (${o.wallets.map(shortAddr).join(", ")})`,
               )
-              .join("; ")}. Wallets that appear to be separate parties but were capitalised by the same payer are not independent. Gas top-ups are excluded, so this reflects real funding rather than someone covering a transaction fee.`
-          : "This agent's owner and reviewer wallets were funded from unrelated sources.",
+              .join("; ")}. Wallets that appear to be separate parties but were capitalised by the same payer are not independent. Gas top-ups are excluded, as are faucets and distributors that pay thousands of unrelated wallets, so this reflects a specific funding relationship rather than everyone who has ever received tokens from the same tap.`
+          : "This agent's owner and reviewer wallets were funded from unrelated sources, or only from shared faucets that pay the whole chain.",
     },
     {
       title: "Wallets created together",
