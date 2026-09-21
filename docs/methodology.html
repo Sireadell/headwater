@@ -56,7 +56,7 @@
         </div>
         <div class="method-row">
           <div class="method-label">Automated review timing</div>
-          <div class="method-desc">Measures how ragged the gaps are between a wallet&rsquo;s consecutive reviews. People review at irregular intervals, minutes then hours then days; a script does not. The measure is the coefficient of variation, which is scale-free, so it catches a bot firing every 50 seconds and one firing every 50 minutes alike. It only fires on 5 or more intervals, so a short uniform run is not enough. Zero-second gaps from reviews sharing a block are excluded, since counting them would manufacture a perfect score.</div>
+          <div class="method-desc">Measures how ragged the gaps are between a wallet&rsquo;s consecutive reviews of one agent. People review at irregular intervals, minutes then hours then days; a script does not. The measure is the coefficient of variation, which is scale-free, so it catches a bot firing every 50 seconds and one firing every 50 minutes alike. It only fires on 5 or more intervals, so a short uniform run is not enough. Zero-second gaps from reviews sharing a block are excluded, since counting them would manufacture a perfect score. Scoring is per agent after an earlier version measured whole histories and missed three of four scripted wallets: a burst on one agent was separated from the next by a long pause, and averaging those pauses in hid the regularity inside each burst.</div>
         </div>
         <div class="method-row">
           <div class="method-label">Deep per-wallet funding history</div>

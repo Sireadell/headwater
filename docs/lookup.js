@@ -48,7 +48,7 @@ function sharedFunderClause(ids) {
 }
 
 const walletDetailQuery = (ids) => `
-query WalletDetail($ids: [String!]!) {${sharedFunderClause(ids)}
+query WalletDetail($ids: [String!]!, $agentId: String!) {${sharedFunderClause(ids)}
   CrossAgentOverlap(where: { id: { _in: $ids } }) {
     id
     agentIds
@@ -71,8 +71,9 @@ query WalletDetail($ids: [String!]!) {${sharedFunderClause(ids)}
     firstSeenBlock
     firstSeenTimestamp
   }
-  ReviewCadence(where: { id: { _in: $ids }, automationSuspected: { _eq: true } }) {
+  ReviewCadence(where: { agent_id: { _eq: $agentId }, automationSuspected: { _eq: true } }) {
     id
+    reviewer_id
     reviewCount
     intervalCount
     meanIntervalSeconds
@@ -260,12 +261,12 @@ function renderAgent(agentId, agent, walletDetail) {
       title: "Automated review timing",
       triggered: cadenceFlagged,
       desc: cadenceFlagged
-        ? `${cadence.length} reviewer wallet(s) post reviews on a near-fixed clock. ${cadence
+        ? `${cadence.length} reviewer wallet(s) worked through this agent on a near-fixed clock. ${cadence
             .map(
               (c) =>
-                `${shortAddr(c.id)} left ${c.reviewCount} reviews at ${c.minIntervalSeconds}-${c.maxIntervalSeconds}s intervals (average ${Math.round(c.meanIntervalSeconds)}s, variation ${c.coefficientOfVariation.toFixed(2)})`,
+                `${shortAddr(c.reviewer_id)} left ${c.reviewCount} reviews at ${c.minIntervalSeconds}-${c.maxIntervalSeconds}s intervals (average ${Math.round(Number(c.meanIntervalSeconds))}s, variation ${Number(c.coefficientOfVariation).toFixed(2)})`,
             )
-            .join("; ")}. Human review timing is ragged and scores well above 1.00; a scripted loop scores near zero.`
+            .join("; ")}. Human review timing is ragged and scores well above 1.00; a scripted loop scores near zero. Measured per agent, so a burst here is not diluted by the same wallet's activity elsewhere.`
         : "No reviewer on this agent posts reviews at machine-like regular intervals.",
     },
     {
@@ -350,7 +351,7 @@ async function checkAgent() {
       ? Array.from(new Set(agent.feedbacks.map((f) => f.reviewer.id)))
       : [];
     const walletDetail = reviewerIds.length > 0
-      ? await graphql(walletDetailQuery(reviewerIds), { ids: reviewerIds })
+      ? await graphql(walletDetailQuery(reviewerIds), { ids: reviewerIds, agentId })
       : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletLabel: [] };
     renderAgent(agentId, agent, walletDetail);
   } catch (err) {
