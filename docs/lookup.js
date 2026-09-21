@@ -84,6 +84,19 @@ const SIGNAL_FRAGMENTS = {
     firstSeenBlock
     firstSeenTimestamp
   }`,
+  // Includes the agent's own owner alongside its reviewers, because the
+  // sharpest version of this is an owner and its reviewers tracing back
+  // to one payer.
+  WalletFunder: `
+  WalletFunder(where: { wallet: { _in: $walletsWithOwner } }) {
+    id
+    wallet
+    funder
+    firstFundedTimestamp
+    valueRaw
+    source
+    isDust
+  }`,
   ReviewCadence: `
   ReviewCadence(where: { agent_id: { _eq: $agentId }, automationSuspected: { _eq: true } }) {
     id
@@ -122,7 +135,7 @@ function hasEntity(name) {
 }
 
 const walletDetailQuery = (ids) => `
-query WalletDetail($ids: [String!]!, $agentId: String!) {${hasEntity("SharedFunder") ? sharedFunderClause(ids) : ""}${Object.entries(
+query WalletDetail($ids: [String!]!, $agentId: String!, $walletsWithOwner: [String!]!) {${hasEntity("SharedFunder") ? sharedFunderClause(ids) : ""}${Object.entries(
   SIGNAL_FRAGMENTS,
 )
   .filter(([name]) => hasEntity(name))
@@ -237,10 +250,30 @@ function renderAgent(agentId, agent, walletDetail) {
     .filter((x) => x.gap >= 0 && x.gap <= 3600)
     .sort((a, b) => a.gap - b.gap);
 
+  // Group wallets by who paid them. Dust is excluded from the verdict:
+  // a gas top-up is not the same relationship as capitalising a wallet,
+  // and conflating them was a live-caught mistake in an earlier project.
+  const funderRows = walletDetail.WalletFunder || [];
+  const walletsByFunder = {};
+  for (const row of funderRows) {
+    if (row.isDust) continue;
+    (walletsByFunder[row.funder] ||= new Set()).add(row.wallet);
+  }
+  const sharedOrigins = Object.entries(walletsByFunder)
+    .map(([funder, wallets]) => ({ funder, wallets: Array.from(wallets) }))
+    .filter((x) => x.wallets.length > 1)
+    .sort((a, b) => b.wallets.length - a.wallets.length);
+  const sharedOriginFlagged = sharedOrigins.length > 0;
+
   const cadenceFlagged = cadence.length > 0;
   const sharedFunderFlagged = sharedFunders.length > 0;
   const anyFlagged =
-    overlapFlagged || circularFlagged || cadenceFlagged || sharedFunderFlagged || birthClusterFlagged;
+    overlapFlagged ||
+    circularFlagged ||
+    cadenceFlagged ||
+    sharedFunderFlagged ||
+    birthClusterFlagged ||
+    sharedOriginFlagged;
 
   const humanDuration = (seconds) => {
     if (seconds < 60) return `${seconds}s`;
@@ -274,6 +307,21 @@ function renderAgent(agentId, agent, walletDetail) {
       desc: fanOutFlagged
         ? `A funder connected to this agent's reviewers paid ${fanOut[0].recipientCount}+ distinct recipients. Exchange/payment-processor shaped; never sufficient alone to call something risky.`
         : "No connected funder shows exchange/payment-processor-shaped payout behavior.",
+    },
+    {
+      title: "Shared funding origin",
+      triggered: sharedOriginFlagged,
+      inactive: !hasEntity("WalletFunder"),
+      desc: !hasEntity("WalletFunder")
+        ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
+        : sharedOriginFlagged
+          ? `${sharedOrigins
+              .map(
+                (o) =>
+                  `${shortAddr(o.funder)} paid ${o.wallets.length} of the wallets behind this agent (${o.wallets.map(shortAddr).join(", ")})`,
+              )
+              .join("; ")}. Wallets that appear to be separate parties but were capitalised by the same payer are not independent. Gas top-ups are excluded, so this reflects real funding rather than someone covering a transaction fee.`
+          : "This agent's owner and reviewer wallets were funded from unrelated sources.",
     },
     {
       title: "Wallets created together",
@@ -406,7 +454,11 @@ async function checkAgent() {
       ? Array.from(new Set(agent.feedbacks.map((f) => f.reviewer.id)))
       : [];
     const walletDetail = reviewerIds.length > 0
-      ? await graphql(walletDetailQuery(reviewerIds), { ids: reviewerIds, agentId })
+      ? await graphql(walletDetailQuery(reviewerIds), {
+          ids: reviewerIds,
+          agentId,
+          walletsWithOwner: Array.from(new Set([...reviewerIds, agent.owner])),
+        })
       : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletBirth: [] };
     renderAgent(agentId, agent, walletDetail);
   } catch (err) {
