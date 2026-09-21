@@ -290,7 +290,7 @@ function renderAgent(agentId, agent, walletDetail) {
     cadenceFlagged ||
     sharedFunderFlagged ||
     birthClusterFlagged ||
-    sharedOriginFlagged;
+    (sharedOriginFlagged && hasEntity("FunderProfile"));
 
   const humanDuration = (seconds) => {
     if (seconds < 60) return `${seconds}s`;
@@ -327,11 +327,18 @@ function renderAgent(agentId, agent, walletDetail) {
     },
     {
       title: "Shared funding origin",
-      triggered: sharedOriginFlagged,
-      inactive: !hasEntity("WalletFunder"),
+      // Without the global per-funder counts, a faucet that pays thousands
+      // of unrelated wallets is indistinguishable from an operator that
+      // paid these five. Reporting a flag in that state would mark every
+      // agent on the chain as suspicious, so the check withholds a verdict
+      // instead of guessing.
+      triggered: sharedOriginFlagged && hasEntity("FunderProfile"),
+      inactive: !hasEntity("WalletFunder") || !hasEntity("FunderProfile"),
       desc: !hasEntity("WalletFunder")
         ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
-        : sharedOriginFlagged
+        : !hasEntity("FunderProfile")
+          ? "Withheld. This indexer build cannot yet separate faucets from real funders, and one wallet on Monad has funded nearly two thousand reviewers. Reporting a result without that distinction would flag every agent on the chain."
+          : sharedOriginFlagged
           ? `${sharedOrigins
               .map(
                 (o) =>
