@@ -47,30 +47,44 @@ function sharedFunderClause(ids) {
   }`;
 }
 
-const walletDetailQuery = (ids) => `
-query WalletDetail($ids: [String!]!, $agentId: String!) {${sharedFunderClause(ids)}
+// Each signal's query fragment, kept separate so the page can ask for
+// only the ones the connected deployment actually has.
+//
+// Envio issues a new endpoint URL per deployment, and serving from one
+// fixed address is a paid feature, so config.js can easily end up
+// pointing at an older build than the code expects. Asking for an entity
+// that build does not have fails the WHOLE query, taking working signals
+// down with the missing one. Introspecting first and omitting what is
+// absent means an older endpoint shows the signals it does support and
+// says plainly which ones it predates.
+const SIGNAL_FRAGMENTS = {
+  CrossAgentOverlap: `
   CrossAgentOverlap(where: { id: { _in: $ids } }) {
     id
     agentIds
     agentCount
-  }
+  }`,
+  CircularFunding: `
   CircularFunding(where: { _or: [{ walletA: { _in: $ids } }, { walletB: { _in: $ids } }] }) {
     id
     walletA
     walletB
-  }
+  }`,
+  FunderFanOut: `
   FunderFanOut(where: { funder: { _in: $ids }, thresholdMet: { _eq: true } }) {
     id
     funder
     recipientCount
     spanSeconds
-  }
+  }`,
+  WalletBirth: `
   WalletBirth(where: { id: { _in: $ids }, foundActivity: { _eq: true } }) {
     id
     wallet
     firstSeenBlock
     firstSeenTimestamp
-  }
+  }`,
+  ReviewCadence: `
   ReviewCadence(where: { agent_id: { _eq: $agentId }, automationSuspected: { _eq: true } }) {
     id
     reviewer_id
@@ -80,13 +94,40 @@ query WalletDetail($ids: [String!]!, $agentId: String!) {${sharedFunderClause(id
     minIntervalSeconds
     maxIntervalSeconds
     coefficientOfVariation
+  }`,
+};
+
+const INTROSPECT_QUERY = `query { __schema { queryType { fields { name } } } }`;
+
+// Which signal entities this endpoint knows about. Resolved once per page
+// load and reused.
+let availableEntities = null;
+
+async function resolveAvailableEntities() {
+  if (availableEntities !== null) return availableEntities;
+  try {
+    const data = await graphql(INTROSPECT_QUERY, {});
+    availableEntities = new Set(data.__schema.queryType.fields.map((f) => f.name));
+  } catch (err) {
+    // If introspection is unavailable, assume the endpoint is current
+    // rather than hiding every signal. A genuinely missing entity will
+    // still surface as a query error, which is the old behaviour.
+    availableEntities = null;
   }
-  WalletLabel(where: { id: { _in: $ids } }) {
-    id
-    nansen_label
-    nansen_category
-    nansen_risk_score
-  }
+  return availableEntities;
+}
+
+function hasEntity(name) {
+  return availableEntities === null || availableEntities.has(name);
+}
+
+const walletDetailQuery = (ids) => `
+query WalletDetail($ids: [String!]!, $agentId: String!) {${hasEntity("SharedFunder") ? sharedFunderClause(ids) : ""}${Object.entries(
+  SIGNAL_FRAGMENTS,
+)
+  .filter(([name]) => hasEntity(name))
+  .map(([, fragment]) => fragment)
+  .join("")}
 }`;
 
 async function graphql(query, variables) {
@@ -141,7 +182,6 @@ function renderAgent(agentId, agent, walletDetail) {
   const cadence = walletDetail.ReviewCadence || [];
   const sharedFunders = walletDetail.SharedFunder || [];
   const births = walletDetail.WalletBirth || [];
-  const labelById = Object.fromEntries((walletDetail.WalletLabel || []).map((l) => [l.id, l]));
 
   const overlapFlagged = reviewers.some((r) => overlapById[r.id]);
   const circularFlagged = circular.length > 0;
@@ -238,7 +278,13 @@ function renderAgent(agentId, agent, walletDetail) {
     {
       title: "Wallets created together",
       triggered: birthClusterFlagged,
-      desc: birthClusterFlagged
+      // A signal the connected deployment has never computed must not
+      // render as CLEAR. An empty result and an absent check look
+      // identical in the data and mean opposite things.
+      inactive: !hasEntity("WalletBirth"),
+      desc: !hasEntity("WalletBirth")
+        ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
+        : birthClusterFlagged
         ? `${birthCluster.size} of this agent's reviewer wallets first appeared on chain within ${humanDuration(birthCluster.spanSeconds)} of each other (${new Date(birthCluster.earliest * 1000).toUTCString().replace("GMT", "UTC")}).${
             quickStarts.length > 0
               ? ` ${quickStarts.length} of them began reviewing within an hour of existing at all, the soonest after ${humanDuration(quickStarts[0].gap)}.`
@@ -251,7 +297,10 @@ function renderAgent(agentId, agent, walletDetail) {
     {
       title: "Shared funding source",
       triggered: sharedFunderFlagged,
-      desc: sharedFunderFlagged
+      inactive: !hasEntity("SharedFunder"),
+      desc: !hasEntity("SharedFunder")
+        ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
+        : sharedFunderFlagged
         ? `${sharedFunders.length} wallet(s) bankrolled more than one reviewer of this agent. ${sharedFunders
             .map((f) => `${shortAddr(f.funder)} funded ${f.fundedReviewerCount} reviewers`)
             .join("; ")}. Funders that pay out at exchange scale are excluded, so this is not simply a busy wallet.`
@@ -260,7 +309,10 @@ function renderAgent(agentId, agent, walletDetail) {
     {
       title: "Automated review timing",
       triggered: cadenceFlagged,
-      desc: cadenceFlagged
+      inactive: !hasEntity("ReviewCadence"),
+      desc: !hasEntity("ReviewCadence")
+        ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
+        : cadenceFlagged
         ? `${cadence.length} reviewer wallet(s) worked through this agent on a near-fixed clock. ${cadence
             .map(
               (c) =>
@@ -342,6 +394,9 @@ async function checkAgent() {
 
   renderLoading();
   try {
+    // Must run before any query is built, since the query's shape depends
+    // on what this endpoint supports.
+    await resolveAvailableEntities();
     const agentData = await graphql(AGENT_QUERY, { agentId });
     const agent = agentData.Agent_by_pk;
     // Deduped: an agent's feedback list repeats a wallet once per entry,
@@ -352,7 +407,7 @@ async function checkAgent() {
       : [];
     const walletDetail = reviewerIds.length > 0
       ? await graphql(walletDetailQuery(reviewerIds), { ids: reviewerIds, agentId })
-      : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletLabel: [] };
+      : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletBirth: [] };
     renderAgent(agentId, agent, walletDetail);
   } catch (err) {
     renderError(err.message);
