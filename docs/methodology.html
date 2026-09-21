@@ -47,6 +47,10 @@
           <div class="method-desc">Reads real Monad AUSD transfer events, verified against real wallets and real on-chain transactions. Live counts at the time of writing: 283 circular-funding pairs and 546 fan-out funders detected across the indexed set.</div>
         </div>
         <div class="method-row">
+          <div class="method-label">Wallets created together</div>
+          <div class="method-desc">Looks up when each reviewer wallet first appeared on chain in any transaction, then checks whether an agent&rsquo;s reviewers share a creation window. Needs three or more inside a day: two wallets born near each other is a coincidence that will happen constantly across thousands of reviewers, but a batch is not. The verdict is reached against each agent&rsquo;s own reviewer set rather than stored per wallet, since the same wallet can sit in a tight cluster for one agent and a loose spread for another. Wallets whose creation date could not be resolved are left out rather than treated as born at block zero, which would make every unknown wallet cluster with all the others.</div>
+        </div>
+        <div class="method-row">
           <div class="method-label">Shared funding source</div>
           <div class="method-desc">Catches one wallet quietly bankrolling several different reviewers, the case the other two funding checks miss: circular funding needs money flowing back, and fan-out only fires at 15 or more recipients. Because exchanges pay reviewers incidentally among thousands of others, any funder already shaped like a payment processor is recorded but not flagged. That exclusion uses the indexer&rsquo;s own fan-out result rather than an outside label service, so it keeps working regardless of third-party availability.</div>
         </div>

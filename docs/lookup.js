@@ -16,6 +16,7 @@ query AgentLookup($agentId: String!) {
     registeredAtTimestamp
     feedbacks {
       id
+      timestamp
       reviewer {
         id
         distinctAgentCount
@@ -63,6 +64,12 @@ query WalletDetail($ids: [String!]!) {${sharedFunderClause(ids)}
     funder
     recipientCount
     spanSeconds
+  }
+  WalletBirth(where: { id: { _in: $ids }, foundActivity: { _eq: true } }) {
+    id
+    wallet
+    firstSeenBlock
+    firstSeenTimestamp
   }
   ReviewCadence(where: { id: { _in: $ids }, automationSuspected: { _eq: true } }) {
     id
@@ -132,14 +139,74 @@ function renderAgent(agentId, agent, walletDetail) {
   const fanOut = walletDetail.FunderFanOut || [];
   const cadence = walletDetail.ReviewCadence || [];
   const sharedFunders = walletDetail.SharedFunder || [];
+  const births = walletDetail.WalletBirth || [];
   const labelById = Object.fromEntries((walletDetail.WalletLabel || []).map((l) => [l.id, l]));
 
   const overlapFlagged = reviewers.some((r) => overlapById[r.id]);
   const circularFlagged = circular.length > 0;
   const fanOutFlagged = fanOut.length > 0;
+  // Birth clustering is decided here rather than in the indexer, because
+  // it is a property of THIS agent's reviewer set, not of any wallet on
+  // its own: the same wallet can sit in a tight cluster for one agent and
+  // a loose spread for another.
+  //
+  // Needs at least three wallets. Two wallets created near each other is
+  // a coincidence that will happen constantly across thousands of
+  // reviewers; three or more inside a single day is the batch-provisioning
+  // shape worth surfacing.
+  const BIRTH_CLUSTER_WINDOW_SECONDS = 24 * 60 * 60;
+  const MIN_BIRTH_CLUSTER_WALLETS = 3;
+
+  const birthTimes = births
+    .map((b) => b.firstSeenTimestamp)
+    .filter((t) => t > 0)
+    .sort((a, b) => a - b);
+
+  // Largest group of birth times falling inside one window, found by
+  // sliding over the sorted list.
+  let birthCluster = { size: 0, spanSeconds: 0, earliest: 0, latest: 0 };
+  for (let i = 0; i < birthTimes.length; i++) {
+    let j = i;
+    while (j + 1 < birthTimes.length && birthTimes[j + 1] - birthTimes[i] <= BIRTH_CLUSTER_WINDOW_SECONDS) {
+      j++;
+    }
+    const size = j - i + 1;
+    if (size > birthCluster.size) {
+      birthCluster = {
+        size,
+        spanSeconds: birthTimes[j] - birthTimes[i],
+        earliest: birthTimes[i],
+        latest: birthTimes[j],
+      };
+    }
+  }
+  const birthClusterFlagged = birthCluster.size >= MIN_BIRTH_CLUSTER_WALLETS;
+
+  // How soon after a wallet first existed did it start reviewing this
+  // agent. A wallet created and used within minutes was made for the job.
+  const firstReviewByWallet = {};
+  for (const f of agent.feedbacks) {
+    const w = f.reviewer.id;
+    if (firstReviewByWallet[w] === undefined || f.timestamp < firstReviewByWallet[w]) {
+      firstReviewByWallet[w] = f.timestamp;
+    }
+  }
+  const quickStarts = births
+    .map((b) => ({ wallet: b.wallet, gap: (firstReviewByWallet[b.id] ?? 0) - b.firstSeenTimestamp }))
+    .filter((x) => x.gap >= 0 && x.gap <= 3600)
+    .sort((a, b) => a.gap - b.gap);
+
   const cadenceFlagged = cadence.length > 0;
   const sharedFunderFlagged = sharedFunders.length > 0;
-  const anyFlagged = overlapFlagged || circularFlagged || cadenceFlagged || sharedFunderFlagged;
+  const anyFlagged =
+    overlapFlagged || circularFlagged || cadenceFlagged || sharedFunderFlagged || birthClusterFlagged;
+
+  const humanDuration = (seconds) => {
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+    if (seconds < 86400) return `${(seconds / 3600).toFixed(1)} hours`;
+    return `${(seconds / 86400).toFixed(1)} days`;
+  };
 
   const overlappingReviewers = reviewers.filter((r) => overlapById[r.id]);
 
@@ -166,6 +233,19 @@ function renderAgent(agentId, agent, walletDetail) {
       desc: fanOutFlagged
         ? `A funder connected to this agent's reviewers paid ${fanOut[0].recipientCount}+ distinct recipients. Exchange/payment-processor shaped; never sufficient alone to call something risky.`
         : "No connected funder shows exchange/payment-processor-shaped payout behavior.",
+    },
+    {
+      title: "Wallets created together",
+      triggered: birthClusterFlagged,
+      desc: birthClusterFlagged
+        ? `${birthCluster.size} of this agent's reviewer wallets first appeared on chain within ${humanDuration(birthCluster.spanSeconds)} of each other (${new Date(birthCluster.earliest * 1000).toUTCString().replace("GMT", "UTC")}).${
+            quickStarts.length > 0
+              ? ` ${quickStarts.length} of them began reviewing within an hour of existing at all, the soonest after ${humanDuration(quickStarts[0].gap)}.`
+              : ""
+          } Independent reviewers have no reason to share a creation date.`
+        : births.length > 0
+          ? `This agent's reviewer wallets were created at unrelated times, so there is no sign of batch provisioning.`
+          : "No wallet creation dates have been resolved for this agent's reviewers yet.",
     },
     {
       title: "Shared funding source",
