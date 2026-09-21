@@ -1,14 +1,14 @@
 // Queries the live headwater-indexer GraphQL endpoint. Field/type names
 // below match schema.graphql as authored (PascalCase entity names,
 // Hasura's standard `_by_pk` convention for a single-row lookup by id).
-// NOT YET VERIFIED against a live schema introspection, since the
-// deployment was down at the time this was written -- if this query
-// fails with a schema error once the endpoint is live, open the
-// GraphQL Playground linked from the Envio dashboard, compare field
-// names there, and fix this query to match.
+// Verified 2026-09-21 directly against the live endpoint: Agent_by_pk
+// requires a chainId argument alongside id (Hasura's full primary key on
+// this multichain-shaped schema), even though only one chain -- Monad,
+// 143 -- is actually indexed. The where-filtered queries below don't need
+// it since they're not pk lookups.
 const AGENT_QUERY = `
 query AgentLookup($agentId: String!) {
-  Agent_by_pk(id: $agentId) {
+  Agent_by_pk(id: $agentId, chainId: 143) {
     id
     owner
     agentURI
