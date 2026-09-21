@@ -25,8 +25,29 @@ query AgentLookup($agentId: String!) {
   }
 }`;
 
-const WALLET_DETAIL_QUERY = `
-query WalletDetail($ids: [String!]!) {
+// SharedFunder stores its funded reviewers as an array, and Hasura's
+// array `_contains` means "contains all of these", not "any of these".
+// Matching any one of an agent's reviewers therefore needs a separate
+// clause per reviewer, which cannot be expressed with a single variable.
+// The ids are hex addresses straight from our own indexer, but they are
+// re-validated here anyway before being written into the query text,
+// since interpolating unvalidated input into a query is how injection
+// happens. Anything that is not a plain 0x-prefixed address is dropped.
+function sharedFunderClause(ids) {
+  const safe = ids.filter((id) => /^0x[0-9a-f]{40}$/i.test(id));
+  if (safe.length === 0) return "";
+  const anyOf = safe.map((id) => `{ fundedReviewers: { _contains: ["${id}"] } }`).join(", ");
+  return `
+  SharedFunder(where: { thresholdMet: { _eq: true }, _or: [${anyOf}] }) {
+    id
+    funder
+    fundedReviewers
+    fundedReviewerCount
+  }`;
+}
+
+const walletDetailQuery = (ids) => `
+query WalletDetail($ids: [String!]!) {${sharedFunderClause(ids)}
   CrossAgentOverlap(where: { id: { _in: $ids } }) {
     id
     agentIds
@@ -110,13 +131,15 @@ function renderAgent(agentId, agent, walletDetail) {
   const circular = walletDetail.CircularFunding || [];
   const fanOut = walletDetail.FunderFanOut || [];
   const cadence = walletDetail.ReviewCadence || [];
+  const sharedFunders = walletDetail.SharedFunder || [];
   const labelById = Object.fromEntries((walletDetail.WalletLabel || []).map((l) => [l.id, l]));
 
   const overlapFlagged = reviewers.some((r) => overlapById[r.id]);
   const circularFlagged = circular.length > 0;
   const fanOutFlagged = fanOut.length > 0;
   const cadenceFlagged = cadence.length > 0;
-  const anyFlagged = overlapFlagged || circularFlagged || cadenceFlagged;
+  const sharedFunderFlagged = sharedFunders.length > 0;
+  const anyFlagged = overlapFlagged || circularFlagged || cadenceFlagged || sharedFunderFlagged;
 
   const overlappingReviewers = reviewers.filter((r) => overlapById[r.id]);
 
@@ -143,6 +166,15 @@ function renderAgent(agentId, agent, walletDetail) {
       desc: fanOutFlagged
         ? `A funder connected to this agent's reviewers paid ${fanOut[0].recipientCount}+ distinct recipients. Exchange/payment-processor shaped; never sufficient alone to call something risky.`
         : "No connected funder shows exchange/payment-processor-shaped payout behavior.",
+    },
+    {
+      title: "Shared funding source",
+      triggered: sharedFunderFlagged,
+      desc: sharedFunderFlagged
+        ? `${sharedFunders.length} wallet(s) bankrolled more than one reviewer of this agent. ${sharedFunders
+            .map((f) => `${shortAddr(f.funder)} funded ${f.fundedReviewerCount} reviewers`)
+            .join("; ")}. Funders that pay out at exchange scale are excluded, so this is not simply a busy wallet.`
+        : "No single wallet is known to have funded more than one of this agent's reviewers.",
     },
     {
       title: "Automated review timing",
@@ -231,10 +263,15 @@ async function checkAgent() {
   try {
     const agentData = await graphql(AGENT_QUERY, { agentId });
     const agent = agentData.Agent_by_pk;
-    const reviewerIds = agent ? agent.feedbacks.map((f) => f.reviewer.id) : [];
+    // Deduped: an agent's feedback list repeats a wallet once per entry,
+    // and one wallet already has 19 entries on a single agent, so the raw
+    // list would send the same address to the query many times over.
+    const reviewerIds = agent
+      ? Array.from(new Set(agent.feedbacks.map((f) => f.reviewer.id)))
+      : [];
     const walletDetail = reviewerIds.length > 0
-      ? await graphql(WALLET_DETAIL_QUERY, { ids: reviewerIds })
-      : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], WalletLabel: [] };
+      ? await graphql(walletDetailQuery(reviewerIds), { ids: reviewerIds })
+      : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletLabel: [] };
     renderAgent(agentId, agent, walletDetail);
   } catch (err) {
     renderError(err.message);
