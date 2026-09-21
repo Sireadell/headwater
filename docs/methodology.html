@@ -44,7 +44,7 @@
         </div>
         <div class="method-row">
           <div class="method-label">Funding-provenance signal</div>
-          <div class="method-desc">Reads real Monad AUSD transfer events, verified against real wallets and real on-chain transactions. Live counts at the time of writing: 283 circular-funding pairs and 546 fan-out funders detected across the indexed set.</div>
+          <div class="method-desc">Reads real transfer events on Monad, verified against real wallets and real transactions. One caveat stated plainly, because the raw numbers are easy to misread: the circular-funding and fan-out checks run over AUSD, and no reviewer wallet on this registry has ever moved AUSD. So their hit counts describe unrelated token traffic, not agent reputation, and they are not evidence about any agent. The checks that actually apply to reviewers are the native-MON provenance ones listed above.</div>
         </div>
         <div class="method-row">
           <div class="method-label">Shared funding origin</div>
@@ -64,7 +64,7 @@
         </div>
         <div class="method-row">
           <div class="method-label">Deep per-wallet funding history</div>
-          <div class="method-desc">The live index only covers a recent block window, which a patient attacker could fund around. So the first time a wallet appears as a reviewer, its full AUSD history is pulled on demand via HyperSync and fed through the same checks. Verified working: transfers from ~49 million blocks before the live window are present in the data.</div>
+          <div class="method-desc">A live index only covers a recent window, which a patient funder could simply pay around: the money arrives long before the wallet ever reviews anything and becomes worth watching. So the first time a wallet appears as a reviewer, its full history is pulled on demand, back to its very first transaction. An earlier version did this for AUSD as well, and it was removed once measured: it returned nothing across 4,476 reviewers, because reviewers here do not hold AUSD, while consuming roughly half of all indexing time.</div>
         </div>
         <div class="method-row">
           <div class="method-label">9 detection signals</div>
@@ -81,7 +81,7 @@
       <div class="method-list">
         <div class="method-row">
           <div class="method-label">Token coverage</div>
-          <div class="method-desc">Tracks AUSD, the stablecoin real agents use to pay each other on Monad today. Native MON transfers are not yet indexed &mdash; a funder paying in native MON is currently invisible to this tool.</div>
+          <div class="method-desc">This page previously said AUSD was &ldquo;the stablecoin real agents use to pay each other on Monad today&rdquo;. That was wrong, and it was never checked before being published. Measured on 2026-09-21: across 4,476 reviewer wallets the AUSD trace returned zero results, and querying transfer history directly for individual reviewers, including the most active ones in the flagged cluster, returned zero transfers each. Reviewers on this registry do not use AUSD at all. The funding that matters here moves in native MON, which is what the provenance checks above now follow. Submitting a review costs nothing but gas, so there is no payment attached to a review to trace in the first place.</div>
         </div>
       </div>
     </div>
