@@ -90,7 +90,13 @@ function renderAgent(agentId, agent, walletDetail) {
     return;
   }
 
-  const reviewers = agent.feedbacks.map((f) => f.reviewer);
+  // A wallet can leave many separate feedback entries on the same agent
+  // (repeat reviews, revoke-and-resubmit, etc), so agent.feedbacks.length
+  // is a feedback-entry count, not a reviewer count. Dedupe by wallet id
+  // for anything that claims to describe "how many reviewers."
+  const reviewers = Array.from(
+    new Map(agent.feedbacks.map((f) => [f.reviewer.id, f.reviewer])).values(),
+  );
   const overlapById = Object.fromEntries((walletDetail.CrossAgentOverlap || []).map((o) => [o.id, o]));
   const circular = walletDetail.CircularFunding || [];
   const fanOut = walletDetail.FunderFanOut || [];
@@ -101,12 +107,14 @@ function renderAgent(agentId, agent, walletDetail) {
   const fanOutFlagged = fanOut.length > 0;
   const anyFlagged = overlapFlagged || circularFlagged;
 
+  const overlappingReviewers = reviewers.filter((r) => overlapById[r.id]);
+
   const signals = [
     {
       title: "Cross-agent review overlap",
       triggered: overlapFlagged,
       desc: overlapFlagged
-        ? `${reviewers.filter((r) => overlapById[r.id]).length} reviewer wallet(s) on this agent also reviewed other agents: ${reviewers.filter((r) => overlapById[r.id]).map((r) => overlapById[r.id].agentIds.join(", ")).join(" / ")}.`
+        ? `${overlappingReviewers.length} distinct reviewer wallet(s) on this agent also reviewed other agents: ${overlappingReviewers.map((r) => overlapById[r.id].agentIds.join(", ")).join(" / ")}.`
         : "No reviewer on this agent has reviewed any other agent, based on full registry history.",
     },
     {
@@ -149,8 +157,8 @@ function renderAgent(agentId, agent, walletDetail) {
               <div class="info-item-value mono">${agent.registeredAtBlock.toLocaleString()}</div>
             </div>
             <div>
-              <div class="info-item-label">Total reviewers</div>
-              <div class="info-item-value mono">${reviewers.length}</div>
+              <div class="info-item-label">Distinct reviewer wallets</div>
+              <div class="info-item-value mono">${reviewers.length}${agent.feedbacks.length !== reviewers.length ? ` (${agent.feedbacks.length} feedback entries)` : ""}</div>
             </div>
             <div>
               <div class="info-item-label">Nansen label (owner)</div>
