@@ -43,6 +43,15 @@ query WalletDetail($ids: [String!]!) {
     recipientCount
     spanSeconds
   }
+  ReviewCadence(where: { id: { _in: $ids }, automationSuspected: { _eq: true } }) {
+    id
+    reviewCount
+    intervalCount
+    meanIntervalSeconds
+    minIntervalSeconds
+    maxIntervalSeconds
+    coefficientOfVariation
+  }
   WalletLabel(where: { id: { _in: $ids } }) {
     id
     nansen_label
@@ -100,12 +109,14 @@ function renderAgent(agentId, agent, walletDetail) {
   const overlapById = Object.fromEntries((walletDetail.CrossAgentOverlap || []).map((o) => [o.id, o]));
   const circular = walletDetail.CircularFunding || [];
   const fanOut = walletDetail.FunderFanOut || [];
+  const cadence = walletDetail.ReviewCadence || [];
   const labelById = Object.fromEntries((walletDetail.WalletLabel || []).map((l) => [l.id, l]));
 
   const overlapFlagged = reviewers.some((r) => overlapById[r.id]);
   const circularFlagged = circular.length > 0;
   const fanOutFlagged = fanOut.length > 0;
-  const anyFlagged = overlapFlagged || circularFlagged;
+  const cadenceFlagged = cadence.length > 0;
+  const anyFlagged = overlapFlagged || circularFlagged || cadenceFlagged;
 
   const overlappingReviewers = reviewers.filter((r) => overlapById[r.id]);
 
@@ -132,6 +143,18 @@ function renderAgent(agentId, agent, walletDetail) {
       desc: fanOutFlagged
         ? `A funder connected to this agent's reviewers paid ${fanOut[0].recipientCount}+ distinct recipients. Exchange/payment-processor shaped; never sufficient alone to call something risky.`
         : "No connected funder shows exchange/payment-processor-shaped payout behavior.",
+    },
+    {
+      title: "Automated review timing",
+      triggered: cadenceFlagged,
+      desc: cadenceFlagged
+        ? `${cadence.length} reviewer wallet(s) post reviews on a near-fixed clock. ${cadence
+            .map(
+              (c) =>
+                `${shortAddr(c.id)} left ${c.reviewCount} reviews at ${c.minIntervalSeconds}-${c.maxIntervalSeconds}s intervals (average ${Math.round(c.meanIntervalSeconds)}s, variation ${c.coefficientOfVariation.toFixed(2)})`,
+            )
+            .join("; ")}. Human review timing is ragged and scores well above 1.00; a scripted loop scores near zero.`
+        : "No reviewer on this agent posts reviews at machine-like regular intervals.",
     },
     {
       // Deliberately reports itself as inactive rather than as a clean

@@ -47,6 +47,10 @@
           <div class="method-desc">Reads real Monad AUSD transfer events, verified against real wallets and real on-chain transactions. Live counts at the time of writing: 283 circular-funding pairs and 546 fan-out funders detected across the indexed set.</div>
         </div>
         <div class="method-row">
+          <div class="method-label">Automated review timing</div>
+          <div class="method-desc">Measures how ragged the gaps are between a wallet&rsquo;s consecutive reviews. People review at irregular intervals, minutes then hours then days; a script does not. The measure is the coefficient of variation, which is scale-free, so it catches a bot firing every 50 seconds and one firing every 50 minutes alike. It only fires on 5 or more intervals, so a short uniform run is not enough. Zero-second gaps from reviews sharing a block are excluded, since counting them would manufacture a perfect score.</div>
+        </div>
+        <div class="method-row">
           <div class="method-label">Deep per-wallet funding history</div>
           <div class="method-desc">The live index only covers a recent block window, which a patient attacker could fund around. So the first time a wallet appears as a reviewer, its full AUSD history is pulled on demand via HyperSync and fed through the same checks. Verified working: transfers from ~49 million blocks before the live window are present in the data.</div>
         </div>
@@ -79,10 +83,6 @@
         <div class="method-row">
           <div class="method-label">Wallet reputation labels</div>
           <div class="method-desc">Previously described here as working. It is not. The code path exists but points at an endpoint that returns 404, and no API key is configured, so not a single wallet has ever been screened against exchange or institutional labels. The lookup page now reports this as NOT ACTIVE rather than showing an empty result as if it were a clean pass. Corrected on 2026-09-21 after checking the live table and finding it empty chain-wide.</div>
-        </div>
-        <div class="method-row">
-          <div class="method-label">Review-timing analysis</div>
-          <div class="method-desc">Every feedback entry carries a timestamp, but nothing currently uses them. Manual inspection of one flagged cluster showed ten reviews from one wallet spaced 48 to 82 seconds apart, then the next wallet starting minutes after the first finished. That machine-like cadence is not yet a signal the tool computes.</div>
         </div>
         <div class="method-row">
           <div class="method-label">Agent Wallet hook</div>
