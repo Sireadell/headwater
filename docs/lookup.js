@@ -134,11 +134,16 @@ function renderAgent(agentId, agent, walletDetail) {
         : "No connected funder shows exchange/payment-processor-shaped payout behavior.",
     },
     {
-      title: "Nansen wallet reputation",
-      triggered: Object.keys(labelById).length > 0,
-      desc: Object.keys(labelById).length > 0
-        ? `${Object.keys(labelById).length} reviewer wallet(s) carry a Nansen label: ${Object.values(labelById).map((l) => l.nansen_category || l.nansen_label || "unlabeled").join(", ")}.`
-        : "None of this agent's reviewer wallets match a known exchange, market-maker, liquidity pool, or institutional label.",
+      // Deliberately reports itself as inactive rather than as a clean
+      // result. The handler's Nansen call targets an endpoint that returns
+      // 404 and no API key is configured, so the WalletLabel table is empty
+      // chain-wide. Rendering that emptiness as "no wallet matched a known
+      // exchange" would read as a completed check that passed, which is the
+      // opposite of what happened: the check never ran.
+      title: "Wallet reputation labels",
+      triggered: false,
+      inactive: true,
+      desc: "Not active. This check is wired up but has no working data source, so no wallet on this agent has actually been screened against exchange, market-maker or institutional labels. Treated as unknown, not as clean.",
     },
   ];
 
@@ -161,8 +166,8 @@ function renderAgent(agentId, agent, walletDetail) {
               <div class="info-item-value mono">${reviewers.length}${agent.feedbacks.length !== reviewers.length ? ` (${agent.feedbacks.length} feedback entries)` : ""}</div>
             </div>
             <div>
-              <div class="info-item-label">Nansen label (owner)</div>
-              <div class="info-item-value mono">${labelById[agent.owner] ? (labelById[agent.owner].nansen_category || labelById[agent.owner].nansen_label) : "unlabeled, no known category"}</div>
+              <div class="info-item-label">Feedback entries</div>
+              <div class="info-item-value mono">${agent.feedbacks.length}</div>
             </div>
           </div>
         </div>
@@ -179,7 +184,7 @@ function renderAgent(agentId, agent, walletDetail) {
         <div class="signals-list">
           ${signals.map((s) => `
             <div class="signal-row">
-              <span class="badge ${s.triggered ? (s.circumstantial ? "badge-amber" : "badge-red") : "badge-mut"} mono">${s.triggered ? (s.circumstantial ? "CIRCUMSTANTIAL" : "TRIGGERED") : "CLEAR"}</span>
+              <span class="badge ${s.inactive ? "badge-mut" : s.triggered ? (s.circumstantial ? "badge-amber" : "badge-red") : "badge-mut"} mono">${s.inactive ? "NOT ACTIVE" : s.triggered ? (s.circumstantial ? "CIRCUMSTANTIAL" : "TRIGGERED") : "CLEAR"}</span>
               <div>
                 <div class="signal-title">${s.title}</div>
                 <div class="signal-desc">${s.desc}</div>
