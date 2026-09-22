@@ -52,7 +52,25 @@ look independent when you scroll a registry."
 "That isn't guessed from behaviour. It's a transaction. Five MON to each
 one, all inside about a minute."
 
-**[0:50-1:40] Walk down the other signals.**
+**[0:50-1:10] The reviewer that ties it together.**
+
+"There's one reviewer wallet I want to show you, because it's the
+clearest thing on this page."
+
+"It reviewed nineteen times, but it only sent nine transactions. Every
+one of those nine carried two reviews at once. A positive score for one
+agent and a negative score for another, in the same transaction. Eight
+of the nine put the positive on agent 153 and the negative on one of its
+five siblings."
+
+"And that wallet was sent gas money by two of the six owner wallets,
+including the owner of agent 153, three seconds apart. Sixty one seconds
+later it posted again."
+
+"So the owner of the agent being scored paid the gas for a wallet that
+was scoring it up and scoring its rivals down, in the same transaction."
+
+**[1:10-1:50] Walk down the other signals.**
 
 "Once you know that, everything else lines up."
 
@@ -69,7 +87,7 @@ reviewed more than one agent. On its own it catches almost nothing, and
 anyone hiding would just use each wallet once. That's why the funding
 trail matters more."
 
-**[1:40-2:20] Methodology page.**
+**[1:50-2:20] Methodology page.**
 
 "Everything is written down here, including what doesn't work."
 
@@ -156,6 +174,13 @@ Every figure here was measured, not estimated. Don't round them up.
 - Reviewer wallets created inside a 48 minute window
 - First review 57 seconds after that wallet's first transaction
 - Review gaps of 48 to 82 seconds
+- The paired reviewer: 19 reviews across 9 transactions, 2 reviews per
+  transaction, always one positive and one negative
+- 8 of those 9 put the positive on agent 153
+- It was funded by 2 of the 6 owner wallets, 3 seconds apart, and posted
+  again 61 seconds later
+- That gas arrived after it had already started reviewing, not before.
+  Do not say it was funded first
 - The faucet has funded 7,665 wallets
 - The 73 percent figure is arXiv 2606.26028, checked against the paper's
   own abstract
