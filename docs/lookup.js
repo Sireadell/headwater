@@ -107,6 +107,17 @@ const SIGNAL_FRAGMENTS = {
     funder
     distinctWalletsFunded
   }`,
+  // What this agent's OWNER has paid for. The sharpest finding in the live
+  // data was an owner funding the owners of five other agents, none of
+  // whom ever reviewed anything, so it only becomes visible by asking
+  // about the owner's outbound edges directly.
+  "WalletFunder::ownerFunded": `
+  ownerFunded: WalletFunder(where: { funder: { _eq: $owner }, isDust: { _eq: false } }, limit: 200) {
+    wallet
+    firstFundedTimestamp
+    valueRaw
+    source
+  }`,
   ReviewCadence: `
   ReviewCadence(where: { agent_id: { _eq: $agentId }, automationSuspected: { _eq: true } }) {
     id
@@ -145,10 +156,12 @@ function hasEntity(name) {
 }
 
 const walletDetailQuery = (ids) => `
-query WalletDetail($ids: [String!]!, $agentId: String!, $walletsWithOwner: [String!]!) {${hasEntity("SharedFunder") ? sharedFunderClause(ids) : ""}${Object.entries(
+query WalletDetail($ids: [String!]!, $agentId: String!, $walletsWithOwner: [String!]!, $owner: String!) {${hasEntity("SharedFunder") ? sharedFunderClause(ids) : ""}${Object.entries(
   SIGNAL_FRAGMENTS,
 )
-  .filter(([name]) => hasEntity(name))
+  // A key may be "Entity::alias" when one entity is queried twice under
+  // different aliases; only the part before "::" is an entity name.
+  .filter(([name]) => hasEntity(name.split("::")[0]))
   .map(([, fragment]) => fragment)
   .join("")}
 }`;
@@ -282,6 +295,13 @@ function renderAgent(agentId, agent, walletDetail) {
     .sort((a, b) => b.wallets.length - a.wallets.length);
   const sharedOriginFlagged = sharedOrigins.length > 0;
 
+  // Wallets this agent's owner paid that turned out to own agents of
+  // their own. Excludes this agent, and excludes the owner paying itself.
+  const ownerFundedAgents = (walletDetail.ownerFundedAgents || []).filter(
+    (a) => a.id !== agentId && a.owner !== agent.owner,
+  );
+  const ownerFundedAgentsFlagged = ownerFundedAgents.length > 0;
+
   const cadenceFlagged = cadence.length > 0;
   const sharedFunderFlagged = sharedFunders.length > 0;
   const anyFlagged =
@@ -290,7 +310,8 @@ function renderAgent(agentId, agent, walletDetail) {
     cadenceFlagged ||
     sharedFunderFlagged ||
     birthClusterFlagged ||
-    (sharedOriginFlagged && hasEntity("FunderProfile"));
+    (sharedOriginFlagged && hasEntity("FunderProfile")) ||
+    ownerFundedAgentsFlagged;
 
   const humanDuration = (seconds) => {
     if (seconds < 60) return `${seconds}s`;
@@ -302,6 +323,20 @@ function renderAgent(agentId, agent, walletDetail) {
   const overlappingReviewers = reviewers.filter((r) => overlapById[r.id]);
 
   const signals = [
+    {
+      // Listed first because it is the strongest thing this tool can show:
+      // a direct funding edge, not an inference from behaviour.
+      title: "Owner funded other agents",
+      triggered: ownerFundedAgentsFlagged,
+      inactive: !hasEntity("WalletFunder"),
+      desc: !hasEntity("WalletFunder")
+        ? "Not available on the connected indexer build, which predates this check. Treated as unknown, not as clean."
+        : ownerFundedAgentsFlagged
+          ? `This agent's owner wallet paid for the wallets that own ${ownerFundedAgents.length} other agent${ownerFundedAgents.length === 1 ? "" : "s"}: ${ownerFundedAgents
+              .map((a) => `agent ${a.id}`)
+              .join(", ")}. Agents with different owner wallets look independent; a shared payer says they are not. This is a funding transaction on chain, not a pattern read from review behaviour.`
+          : "This agent's owner has not been seen paying for any other agent's owner wallet.",
+    },
     {
       title: "Cross-agent review overlap",
       triggered: overlapFlagged,
@@ -482,8 +517,21 @@ async function checkAgent() {
           ids: reviewerIds,
           agentId,
           walletsWithOwner: Array.from(new Set([...reviewerIds, agent.owner])),
+          owner: agent.owner,
         })
       : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletBirth: [] };
+
+    // Second hop: of the wallets this agent's owner paid, which ones own
+    // agents themselves? That is the "six agents, one operator" finding,
+    // and it needs the funded list before it can be asked.
+    const fundedWallets = (walletDetail.ownerFunded || []).map((r) => r.wallet);
+    walletDetail.ownerFundedAgents = fundedWallets.length > 0
+      ? (await graphql(
+          `query($owners: [String!]!) { Agent(where: { owner: { _in: $owners } }) { id owner registeredAtTimestamp } }`,
+          { owners: fundedWallets },
+        )).Agent
+      : [];
+
     renderAgent(agentId, agent, walletDetail);
   } catch (err) {
     renderError(err.message);
