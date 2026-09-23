@@ -523,9 +523,16 @@ function renderAgent(agentId, agent, walletDetail, provenance) {
 const PAGE = 1000;
 
 async function allReviewerIds(agentId, firstPage) {
-  const ids = firstPage.map((f) => f.reviewer.id);
-  if (firstPage.length < PAGE) return ids;
-  for (let offset = PAGE; ; offset += PAGE) {
+  if (firstPage.length < PAGE) return firstPage.map((f) => f.reviewer.id);
+
+  // Past the cap, the nested list is thrown away rather than used as page one.
+  // Its row order is not the order this pagination walks, so treating it as the
+  // first page skips whatever it happened to exclude while re-reading rows it
+  // already had. That produced 6,790 raters for an agent that has 7,665, and a
+  // number that is wrong by 11% while looking precise is worse than no number.
+  // Re-reading the first thousand rows costs one query and removes the guess.
+  const ids = [];
+  for (let offset = 0; ; offset += PAGE) {
     const data = await graphql(
       `query More($agentId: String!, $offset: Int!) {
          Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
@@ -536,9 +543,8 @@ async function allReviewerIds(agentId, firstPage) {
     );
     const rows = data.Feedback || [];
     // Verified against the live endpoint 2026-09-23: both Feedback.reviewer_id
-    // and Feedback.reviewer.id are the bare lowercase address, with no chain
-    // prefix, so the two pages produce the same shape of id and can be deduped
-    // against each other directly.
+    // and Feedback.reviewer.id are the bare lowercase address with no chain
+    // prefix, so ids from either query dedupe against each other directly.
     for (const r of rows) ids.push(r.reviewer_id);
     if (rows.length < PAGE) return ids;
     // A malformed response that keeps returning full pages must not spin
@@ -546,6 +552,7 @@ async function allReviewerIds(agentId, firstPage) {
     if (offset > 50000) return ids;
   }
 }
+
 
 async function checkAgent() {
   const agentId = document.getElementById("agentId").value.trim();
