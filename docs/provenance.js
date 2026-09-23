@@ -95,19 +95,36 @@ async function classifyRaters(addresses) {
 // caller decides what weight to give it.
 async function fundersOf(wallets) {
   if (wallets.length === 0) return new Map();
-  const query = `
-    query Funders($wallets: [String!]!) {
-      WalletFunder(where: { wallet: { _in: $wallets } }, limit: 2000) {
-        wallet
-        funder
-        isDust
-      }
-    }`;
-  const data = await graphql(query, { wallets });
   const map = new Map();
-  for (const row of data.WalletFunder || []) {
-    if (!map.has(row.wallet)) map.set(row.wallet, []);
-    map.get(row.wallet).push({ funder: row.funder, isDust: row.isDust });
+  // Two separate caps bite here and neither announces itself. The endpoint
+  // returns at most 1,000 rows however large a `limit` is asked for, and a
+  // very long `_in` list fails the whole query outright ("database query
+  // error" at 7,665 ids, verified 2026-09-23). So the wallets are sent in
+  // modest batches, and each batch is walked with an offset until a short
+  // page proves it is exhausted. Agent 182 has 7,665 raters, so a silent
+  // truncation here would quietly turn "all of them" into "the first
+  // thirteen percent of them" while still reading as a complete answer.
+  const BATCH = 500;
+  const PAGE = 1000;
+  for (let i = 0; i < wallets.length; i += BATCH) {
+    const batch = wallets.slice(i, i + BATCH);
+    for (let offset = 0; ; offset += PAGE) {
+      const query = `
+        query Funders($wallets: [String!]!, $offset: Int!) {
+          WalletFunder(where: { wallet: { _in: $wallets } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
+            wallet
+            funder
+            isDust
+          }
+        }`;
+      const data = await graphql(query, { wallets: batch, offset });
+      const rows = data.WalletFunder || [];
+      for (const row of rows) {
+        if (!map.has(row.wallet)) map.set(row.wallet, []);
+        map.get(row.wallet).push({ funder: row.funder, isDust: row.isDust });
+      }
+      if (rows.length < PAGE) break;
+    }
   }
   return map;
 }

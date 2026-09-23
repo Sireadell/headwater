@@ -569,11 +569,20 @@ async function checkAgent() {
     const reviewerIds = agent
       ? Array.from(new Set(await allReviewerIds(agentId, agent.feedbacks)))
       : [];
-    const walletDetail = reviewerIds.length > 0
-      ? await graphql(walletDetailQuery(reviewerIds), {
-          ids: reviewerIds,
+    // The signal fragments below were written for the handful of reviewers a
+    // typical agent has, and one of them expands to a separate `_or` clause
+    // per reviewer. Past roughly three thousand clauses the endpoint rejects
+    // the whole query, which took agent 182's 7,665 raters down with it. The
+    // provenance trace above does its own batching and still sees every
+    // rater; only these secondary signals are capped, and the cap is stated
+    // on the page rather than left to be inferred from a short list.
+    const SIGNAL_REVIEWER_CAP = 500;
+    const signalReviewerIds = reviewerIds.slice(0, SIGNAL_REVIEWER_CAP);
+    const walletDetail = signalReviewerIds.length > 0
+      ? await graphql(walletDetailQuery(signalReviewerIds), {
+          ids: signalReviewerIds,
           agentId,
-          walletsWithOwner: Array.from(new Set([...reviewerIds, agent.owner])),
+          walletsWithOwner: Array.from(new Set([...signalReviewerIds, agent.owner])),
           owner: agent.owner,
         })
       : { CrossAgentOverlap: [], CircularFunding: [], FunderFanOut: [], ReviewCadence: [], SharedFunder: [], WalletBirth: [] };
