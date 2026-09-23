@@ -30,7 +30,7 @@ const TOOLS = [
       "own owner (directly or through one intermediary wallet), whether the owner " +
       "rated itself, whether the raters are people or application contracts, and " +
       "whether there is any rating at all. Returns a verdict of NO EVIDENCE, THIN, " +
-      "SELF REVIEWED, APP GENERATED, OWNER FUNDED or NO LINK FOUND, with the " +
+      "SELF REVIEWED, APP GENERATED, ROUND TRIP, OWNER FUNDED or NO LINK FOUND, with the " +
       "evidence behind it. This describes where money came from. It is not a " +
       "judgement of anyone's intent, and a funded campaign can be legitimate.",
     inputSchema: {

@@ -71,8 +71,8 @@ export async function graphql(query, variables, attempt = 0) {
 globalThis.graphql = graphql;
 
 const provenanceSrc = readFileSync(join(root, "docs/provenance.js"), "utf8");
-export const { classifyRaters, traceOwnerFunding, buildVerdict } = new Function(
-  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, buildVerdict };`,
+export const { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict } = new Function(
+  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict };`,
 )();
 
 const PAGE = 1000;
@@ -82,21 +82,33 @@ const PAGE = 1000;
 // the only reliable signal that the walk is finished.
 export async function ratersOf(agentId) {
   const ids = [];
+  // Earliest rating per rater. Needed to say whether a payment to the owner
+  // came before or after the rating, which is the whole difference between a
+  // customer and a wallet that was paid to have an opinion. The timestamp
+  // costs nothing extra: it rides along on a query that was already being
+  // made.
+  const firstRatedAt = new Map();
   for (let offset = 0; ; offset += PAGE) {
     const data = await graphql(
       `query Raters($agentId: String!, $offset: Int!) {
          Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
            reviewer_id
+           timestamp
          }
        }`,
       { agentId, offset },
     );
     const rows = data.Feedback || [];
-    for (const r of rows) ids.push(r.reviewer_id.toLowerCase());
+    for (const r of rows) {
+      const id = r.reviewer_id.toLowerCase();
+      ids.push(id);
+      const prev = firstRatedAt.get(id);
+      if (prev === undefined || r.timestamp < prev) firstRatedAt.set(id, r.timestamp);
+    }
     if (rows.length < PAGE) break;
     if (offset > 50000) break;
   }
-  return { raters: [...new Set(ids)], feedbackCount: ids.length };
+  return { raters: [...new Set(ids)], feedbackCount: ids.length, firstRatedAt };
 }
 
 // The whole answer for one agent, in the shape the API and the MCP tool both
@@ -112,8 +124,9 @@ export async function checkAgent(agentId) {
   if (!agent) return null;
 
   const owner = agent.owner.toLowerCase();
-  const { raters, feedbackCount } = await ratersOf(String(agentId));
+  const { raters, feedbackCount, firstRatedAt } = await ratersOf(String(agentId));
   const funding = await traceOwnerFunding(owner, raters);
+  const payments = await tracePayments(owner, raters, firstRatedAt);
   const raterTypes = await classifyRaters(raters);
   const selfRated = raters.includes(owner) ? 1 : 0;
   const verdict = buildVerdict({
@@ -123,7 +136,12 @@ export async function checkAgent(agentId) {
     funding,
     raterTypes,
     selfRated,
+    payments,
   });
+  const ownerFundedSet = new Set([
+    ...funding.direct.map((d) => d.rater),
+    ...funding.indirect.map((i) => i.rater),
+  ]);
 
   return {
     agentId: String(agentId),
@@ -146,6 +164,14 @@ export async function checkAgent(agentId) {
       contractRaters: [...raterTypes.classified.values()].filter((v) => v.isContract).length,
       applicationRaters: [...raterTypes.classified.values()].filter((v) => v.app).length,
       ratersCheckedForCode: raterTypes.sampled,
+      paidOwnerBeforeRating: payments.paidBefore.length,
+      paidOwnerAfterRating: payments.paidAfter.length,
+      // Funded by the owner, then sent funds back to the owner. Reported
+      // separately from a bare payment count because the two support opposite
+      // readings of the same score.
+      roundTripped: payments.paidAfter.filter((p) => ownerFundedSet.has(p.rater)).length,
+      independentPaidBeforeRating: payments.paidBefore.filter((p) => !ownerFundedSet.has(p.rater))
+        .length,
     },
     // Stated on every response, because a caller deciding whether to pay an
     // agent needs to know that a verdict of "no link found" rests on two hops
@@ -153,6 +179,9 @@ export async function checkAgent(agentId) {
     limits: {
       fundingHops: 2,
       fundingAsset: "native MON only",
+      paymentTiming:
+        "A payment is timed against the payer's FIRST payment to this owner, since that is what " +
+        "the index stores. A later payment by an already-paying wallet is not separately timed.",
       codeCheckSample: raterTypes.sampled,
       codeCheckTotal: raterTypes.total,
       note:

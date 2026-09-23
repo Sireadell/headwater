@@ -21,15 +21,20 @@
     "ratersTraced": 1,
     "contractRaters": 0,
     "applicationRaters": 0,
-    "ratersCheckedForCode": 1
+    "ratersCheckedForCode": 1,
+    "paidOwnerBeforeRating": 0,
+    "paidOwnerAfterRating": 0,
+    "roundTripped": 0,
+    "independentPaidBeforeRating": 0
   },
   "limits": {
     "fundingHops": 2,
     "fundingAsset": "native MON only",
+    "paymentTiming": "A payment is timed against the payer's FIRST payment to this owner, since that is what the index stores. A later payment by an already-paying wallet is not separately timed.",
     "codeCheckSample": 1,
     "codeCheckTotal": 1,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
-  "generatedAt": "2026-09-23T09:02:21.682Z"
+  "generatedAt": "2026-09-23T15:05:13.823Z"
 }

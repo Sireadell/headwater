@@ -7,6 +7,7 @@
   "tone": "amber",
   "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
   "findings": [
+    "1 rater paid this agent's owner BEFORE rating it and was not funded by that owner. That is the strongest grounding available here, and it is rare: 3 such relationships exist across the whole chain.",
     "Every rating came from one single address."
   ],
   "evidence": {
@@ -20,15 +21,20 @@
     "ratersTraced": 1,
     "contractRaters": 0,
     "applicationRaters": 0,
-    "ratersCheckedForCode": 1
+    "ratersCheckedForCode": 1,
+    "paidOwnerBeforeRating": 1,
+    "paidOwnerAfterRating": 0,
+    "roundTripped": 0,
+    "independentPaidBeforeRating": 1
   },
   "limits": {
     "fundingHops": 2,
     "fundingAsset": "native MON only",
+    "paymentTiming": "A payment is timed against the payer's FIRST payment to this owner, since that is what the index stores. A later payment by an already-paying wallet is not separately timed.",
     "codeCheckSample": 1,
     "codeCheckTotal": 1,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
-  "generatedAt": "2026-09-23T09:02:03.238Z"
+  "generatedAt": "2026-09-23T15:04:19.842Z"
 }

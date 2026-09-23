@@ -102,6 +102,9 @@ const main = async () => {
       "SELF REVIEWED": "The owner's own wallet is among the raters.",
       "APP GENERATED": "Raters are application contracts recording outcomes, not people.",
       "OWNER FUNDED": "The agent's own owner paid for its raters, directly or via one hop.",
+      "ROUND TRIP":
+        "The owner paid its raters and the same wallets sent funds back to the owner after rating. " +
+        "The money left the owner and returned to the owner.",
       "NO LINK FOUND": "No funding link found across two hops. Weaker evidence than a link.",
     },
     limits: {

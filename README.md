@@ -16,19 +16,26 @@ and what isn't built yet. See `ORIGIN.md` for where the detection code
 came from. See `hackathons/monad-metropolis/BUILD_PLAN.md` in the wider
 hackathons folder for the full build plan.
 
-## Live indexer (Envio + Nansen)
+## Live indexer (Envio)
 
 A separate deployed service, [`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer)
-on Envio Cloud, indexes AUSD funding transfers back roughly 300,000
-blocks (not full chain history -- bounded on purpose, see that repo's
-`config.yaml` for why: a wider window exceeded Envio Cloud's free-tier
-event quota, since AUSD settles activity across all of Monad, not just
-agent wallets), about 6x deeper than this repo's own `monadClient.js`
-fast-path (~50,000-block / ~4.2-hour default cap, which still runs
-independently as the fallback). It also computes circular
-funding and funder fan-out as live, continuously-updated entities, and
-cross-checks flagged wallets against Nansen. That repo's `config.yaml` and
-`schema.graphql` are the source of truth for exactly what's indexed.
+on Envio Cloud, reads the ERC-8004 registries from block 0 and, the
+moment a wallet first appears as a rater or an agent owner, queries
+Envio HyperSync for that one wallet's entire native-MON history back to
+genesis. That is where every funding edge in this product comes from.
+
+Envio is not decoration here, and the deletion test is one command. The
+public Monad RPC answers `eth_getLogs is limited to a 100 range`, and a
+native MON transfer emits no log at all, so the public RPC cannot
+produce a funding trace over 107 million blocks by any route. Remove
+HyperSync and the central promise of this product is gone.
+
+It also computes circular funding, funder fan-out, review cadence,
+wallet birth times and shared funders as live, continuously updated
+entities. That repo's `config.yaml` and `schema.graphql` are the source
+of truth for exactly what's indexed.
+
+Nansen is **not** part of this. See `HONESTY.md`.
 
 ## Running the tests
 

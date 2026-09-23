@@ -430,15 +430,21 @@ function renderAgent(agentId, agent, walletDetail, provenance) {
     },
     {
       // Deliberately reports itself as inactive rather than as a clean
-      // result. The handler's Nansen call targets an endpoint that returns
-      // 404 and no API key is configured, so the WalletLabel table is empty
+      // result. The indexer's Nansen call targets api.nansen.ai/v2/wallet/
+      // overview, which does not exist, so the WalletLabel table is empty
       // chain-wide. Rendering that emptiness as "no wallet matched a known
       // exchange" would read as a completed check that passed, which is the
       // opposite of what happened: the check never ran.
+      //
+      // The reason is our wrong endpoint, not an absent service, and the
+      // distinction matters enough to keep here. Checked 2026-09-23:
+      // api.nansen.ai/api/v1/profiler/address/first-funder answers 402 with an
+      // x402 offer of 0.01 USDC per call and lists Monad, chain 143, among the
+      // networks it accepts. Nothing has been bought, so nothing is claimed.
       title: "Wallet reputation labels",
       triggered: false,
       inactive: true,
-      desc: "Not active. This check is wired up but has no working data source, so no wallet on this agent has actually been screened against exchange, market-maker or institutional labels. Treated as unknown, not as clean.",
+      desc: "Not active. The check is wired up against an endpoint that does not exist, so no wallet on this agent has been screened against exchange, market-maker or institutional labels. Treated as unknown, not as clean. Nansen itself does cover this: its profiler API sells a first-funder answer for 0.01 USDC per call and takes payment on Monad. We have bought none, so this stays off rather than half-true.",
     },
   ];
 
@@ -522,8 +528,22 @@ function renderAgent(agentId, agent, walletDetail, provenance) {
 // page comes back exactly full, keep asking until a short page arrives.
 const PAGE = 1000;
 
+// Returns every rater id on an agent, plus the earliest moment each one rated
+// it. The timestamp is what makes a payment to the owner readable: the same
+// transfer means opposite things depending on whether it landed before or
+// after the rating.
 async function allReviewerIds(agentId, firstPage) {
-  if (firstPage.length < PAGE) return firstPage.map((f) => f.reviewer.id);
+  const firstRatedAt = new Map();
+  const note = (id, ts) => {
+    const key = (id || "").toLowerCase();
+    const prev = firstRatedAt.get(key);
+    if (prev === undefined || ts < prev) firstRatedAt.set(key, ts);
+  };
+
+  if (firstPage.length < PAGE) {
+    for (const f of firstPage) note(f.reviewer.id, f.timestamp);
+    return { ids: firstPage.map((f) => f.reviewer.id), firstRatedAt };
+  }
 
   // Past the cap, the nested list is thrown away rather than used as page one.
   // Its row order is not the order this pagination walks, so treating it as the
@@ -537,6 +557,7 @@ async function allReviewerIds(agentId, firstPage) {
       `query More($agentId: String!, $offset: Int!) {
          Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
            reviewer_id
+           timestamp
          }
        }`,
       { agentId, offset },
@@ -545,11 +566,14 @@ async function allReviewerIds(agentId, firstPage) {
     // Verified against the live endpoint 2026-09-23: both Feedback.reviewer_id
     // and Feedback.reviewer.id are the bare lowercase address with no chain
     // prefix, so ids from either query dedupe against each other directly.
-    for (const r of rows) ids.push(r.reviewer_id);
-    if (rows.length < PAGE) return ids;
+    for (const r of rows) {
+      ids.push(r.reviewer_id);
+      note(r.reviewer_id, r.timestamp);
+    }
+    if (rows.length < PAGE) return { ids, firstRatedAt };
     // A malformed response that keeps returning full pages must not spin
     // forever against a public endpoint.
-    if (offset > 50000) return ids;
+    if (offset > 50000) return { ids, firstRatedAt };
   }
 }
 
@@ -573,9 +597,10 @@ async function checkAgent() {
     // Deduped: an agent's feedback list repeats a wallet once per entry,
     // and one wallet already has 19 entries on a single agent, so the raw
     // list would send the same address to the query many times over.
-    const reviewerIds = agent
-      ? Array.from(new Set(await allReviewerIds(agentId, agent.feedbacks)))
-      : [];
+    const ratings = agent
+      ? await allReviewerIds(agentId, agent.feedbacks)
+      : { ids: [], firstRatedAt: new Map() };
+    const reviewerIds = Array.from(new Set(ratings.ids));
     // The signal fragments below were written for the handful of reviewers a
     // typical agent has, and one of them expands to a separate `_or` clause
     // per reviewer. Past roughly three thousand clauses the endpoint rejects
@@ -614,10 +639,12 @@ async function checkAgent() {
       try {
         const raterAddrs = reviewerIds.map((id) => id.toLowerCase());
         const funding = await traceOwnerFunding(agent.owner, raterAddrs);
+        const payments = await tracePayments(agent.owner, raterAddrs, ratings.firstRatedAt);
         const raterTypes = await classifyRaters(raterAddrs);
         const selfRated = raterAddrs.includes(agent.owner.toLowerCase()) ? 1 : 0;
         provenance = {
           funding,
+          payments,
           raterTypes,
           verdict: buildVerdict({
             owner: agent.owner,
@@ -626,6 +653,7 @@ async function checkAgent() {
             funding,
             raterTypes,
             selfRated,
+            payments,
           }),
         };
       } catch (provErr) {

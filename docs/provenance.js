@@ -129,6 +129,92 @@ async function fundersOf(wallets) {
   return map;
 }
 
+// Did the rater ever pay the agent's owner, and did it pay before or after
+// rating?
+//
+// This is the filter a reasonable person reaches for first: a rating from
+// somebody who actually paid for the service ought to be worth more than a
+// rating from a stranger. It is measured here before it is trusted, and the
+// measurement says it certifies almost nothing on this chain. Across all 84
+// rated agents there are 7,771 (agent, rater) relationships. In 7,670 of them
+// the rater did send native MON to the agent's owner. In exactly 3 of them the
+// payment came BEFORE the rating. Measured 2026-09-23 against the live
+// endpoint; ProofLines published the same 3 from an independent pipeline, so
+// two different methods agree on the number.
+//
+// What the other 7,667 are is the interesting part, and it is why a
+// payment-backed filter used on its own would read this chain exactly
+// backwards. On agent 182 the owner sends a wallet 11 MON, the wallet rates
+// the agent seconds later, and the wallet sends about 10.93 MON straight back
+// to the owner. The money makes a round trip and the owner is out only the
+// gas. Taken alone, "this rater paid the agent" would certify all 7,665 of
+// those as customers.
+//
+// So the payment is recorded with its direction and its timing, never as a
+// bare yes or no.
+//
+// One stated limit: the indexer keeps the earliest payment from each payer to
+// each wallet, so "paid before rating" means the payer's FIRST payment to the
+// owner predates its first rating. A later payment by an already-paying wallet
+// is not separately timed here.
+async function tracePayments(owner, raterIds, firstRatedAt) {
+  const ownerLc = (owner || "").toLowerCase();
+  const raters = raterIds.map((r) => r.toLowerCase());
+  if (!ownerLc || raters.length === 0) {
+    return { paidBefore: [], paidAfter: [], paidUnknownTime: [], tracedRaters: raters.length };
+  }
+
+  // Same two caps as fundersOf: at most 1,000 rows come back however large a
+  // limit is asked for, and a very long `_in` list fails the whole query. So
+  // the raters go out in batches and each batch is walked to exhaustion.
+  const BATCH = 500;
+  const PAGE = 1000;
+  const paidBefore = [];
+  const paidAfter = [];
+  const paidUnknownTime = [];
+
+  for (let i = 0; i < raters.length; i += BATCH) {
+    const batch = raters.slice(i, i + BATCH);
+    for (let offset = 0; ; offset += PAGE) {
+      const query = `
+        query Payments($owner: String!, $raters: [String!]!, $offset: Int!) {
+          WalletFunder(
+            where: { wallet: { _eq: $owner }, funder: { _in: $raters } },
+            limit: ${PAGE}, offset: $offset, order_by: { id: asc }
+          ) {
+            funder
+            isDust
+            valueRaw
+            firstFundedTimestamp
+          }
+        }`;
+      const data = await graphql(query, { owner: ownerLc, raters: batch, offset });
+      const rows = data.WalletFunder || [];
+      for (const row of rows) {
+        const rater = (row.funder || "").toLowerCase();
+        const record = {
+          rater,
+          isDust: row.isDust,
+          valueRaw: row.valueRaw,
+          paidAt: row.firstFundedTimestamp,
+        };
+        const ratedAt = firstRatedAt ? firstRatedAt.get(rater) : undefined;
+        if (ratedAt === undefined || row.firstFundedTimestamp === undefined || row.firstFundedTimestamp === null) {
+          paidUnknownTime.push(record);
+        } else if (row.firstFundedTimestamp <= ratedAt) {
+          paidBefore.push(record);
+        } else {
+          paidAfter.push(record);
+        }
+      }
+      if (rows.length < PAGE) break;
+    }
+  }
+
+  return { paidBefore, paidAfter, paidUnknownTime, tracedRaters: raters.length };
+}
+
+
 // Traces owner money to raters over one and two hops.
 //
 // Hop one is the direct `owner -> rater` payment. Hop two is
@@ -181,8 +267,12 @@ async function traceOwnerFunding(owner, raterIds) {
 // paid for these raters" is checkable. "These reviews are fake" is a claim
 // about somebody's intent, is not checkable, and was wrong the one time this
 // project tried it.
-function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated }) {
+function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated, payments }) {
   const findings = [];
+  // Absent payment data is not the same as no payments, so an older caller
+  // that does not supply it gets an empty record and no payment claim is made
+  // in either direction.
+  const pay = payments || { paidBefore: [], paidAfter: [], paidUnknownTime: [], tracedRaters: 0 };
 
   if (feedbackCount === 0) {
     return {
@@ -209,6 +299,37 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
     findings.push(
       `${funding.indirect.length} more were paid by the owner through ${vias.size} ` +
         `intermediary wallet${vias.size === 1 ? "" : "s"}, which a direct owner-to-rater check does not see.`,
+    );
+  }
+  // Money that left the owner and came back. Stated as a movement, because
+  // that is all it is: the owner funded the rater, the rater rated, the rater
+  // returned funds to the owner. Why anyone did that is not knowable from the
+  // chain and is not claimed here.
+  const ownerFundedSet = new Set([
+    ...funding.direct.map((d) => d.rater),
+    ...funding.indirect.map((i) => i.rater),
+  ]);
+  const roundTrip = pay.paidAfter.filter((p) => ownerFundedSet.has(p.rater));
+  if (roundTrip.length > 0) {
+    findings.push(
+      `${roundTrip.length} rater${roundTrip.length === 1 ? " was" : "s were"} funded by this ` +
+        `agent's owner and then sent funds back to that same owner after rating. The owner's ` +
+        "money made a round trip.",
+    );
+  }
+  const independentPaidBefore = pay.paidBefore.filter((p) => !ownerFundedSet.has(p.rater));
+  if (independentPaidBefore.length > 0) {
+    findings.push(
+      `${independentPaidBefore.length} rater${independentPaidBefore.length === 1 ? "" : "s"} ` +
+        `paid this agent's owner BEFORE rating it and ${independentPaidBefore.length === 1 ? "was" : "were"} ` +
+        "not funded by that owner. That is the strongest grounding available here, and it is rare: " +
+        "3 such relationships exist across the whole chain.",
+    );
+  }
+  if (pay.paidAfter.length > 0 && roundTrip.length === 0) {
+    findings.push(
+      `${pay.paidAfter.length} rater${pay.paidAfter.length === 1 ? "" : "s"} paid this agent's ` +
+        "owner, but only after rating it.",
     );
   }
   if (selfRated > 0) findings.push("The owner's own wallet is among the raters.");
@@ -250,6 +371,29 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
           ? " The owner has also funded raters here, which for an application contract usually " +
             "means paying its gas rather than buying an opinion."
           : ""),
+      findings,
+    };
+  }
+  // Ranked above OWNER FUNDED because it says strictly more: not only did the
+  // owner pay for the raters, the money came back. It stays below APP
+  // GENERATED, because an application contract paid its gas and returning a
+  // balance is ordinary plumbing, and reading that as a round trip would
+  // repeat this project's one serious mistake.
+  if (roundTrip.length > 0) {
+    const share = Math.round((roundTrip.length / Math.max(funding.tracedRaters, 1)) * 100);
+    return {
+      label: "ROUND TRIP",
+      // Same reason as OWNER FUNDED: a half is a real finding and is not
+      // painted the same as a whole.
+      tone: share >= 50 ? "red" : "amber",
+      summary:
+        `${share}% of the traced raters were paid by this agent's own owner and then sent funds ` +
+        "back to that same owner after rating it. The money left the owner and returned to the " +
+        "owner. How much of it returned is not asserted here, only that it went both ways. This " +
+        "describes where the money moved and not why anyone moved it, and a funded campaign can " +
+        "be entirely legitimate. It does mean that a check asking only 'did the rater pay this " +
+        "agent' would read this agent as customer-backed, which the direction and the timing of " +
+        "the money both contradict.",
       findings,
     };
   }

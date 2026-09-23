@@ -11,6 +11,7 @@
     "SELF REVIEWED": "The owner's own wallet is among the raters.",
     "APP GENERATED": "Raters are application contracts recording outcomes, not people.",
     "OWNER FUNDED": "The agent's own owner paid for its raters, directly or via one hop.",
+    "ROUND TRIP": "The owner paid its raters and the same wallets sent funds back to the owner after rating. The money left the owner and returned to the owner.",
     "NO LINK FOUND": "No funding link found across two hops. Weaker evidence than a link."
   },
   "limits": {
@@ -22,8 +23,9 @@
     "agentsRegistered": 10256,
     "agentsEverRated": 84,
     "byVerdict": {
-      "OWNER FUNDED": 18,
+      "ROUND TRIP": 3,
       "THIN": 51,
+      "OWNER FUNDED": 15,
       "APP GENERATED": 6,
       "SELF REVIEWED": 9
     }
@@ -31,7 +33,7 @@
   "agents": [
     {
       "agentId": "182",
-      "verdict": "OWNER FUNDED",
+      "verdict": "ROUND TRIP",
       "distinctRaters": 7665,
       "feedbackCount": 7665,
       "ownerFunded": 7665
@@ -52,7 +54,7 @@
     },
     {
       "agentId": "8317",
-      "verdict": "OWNER FUNDED",
+      "verdict": "ROUND TRIP",
       "distinctRaters": 1,
       "feedbackCount": 78,
       "ownerFunded": 1
@@ -276,7 +278,7 @@
     },
     {
       "agentId": "18",
-      "verdict": "OWNER FUNDED",
+      "verdict": "ROUND TRIP",
       "distinctRaters": 2,
       "feedbackCount": 2,
       "ownerFunded": 2
@@ -619,5 +621,5 @@
     }
   ],
   "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
-  "generatedAt": "2026-09-23T09:04:28.957Z"
+  "generatedAt": "2026-09-23T15:07:33.217Z"
 }
