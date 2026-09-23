@@ -515,6 +515,38 @@ function renderAgent(agentId, agent, walletDetail, provenance) {
     </div>`;
 }
 
+// Hasura caps a result set at 1,000 rows and says nothing when it does. The
+// agent holding most of this chain's feedback has 7,665 raters, so taking
+// `agent.feedbacks` at face value silently reports an eighth of the truth and
+// would have the page contradict a figure anyone can recompute. When the first
+// page comes back exactly full, keep asking until a short page arrives.
+const PAGE = 1000;
+
+async function allReviewerIds(agentId, firstPage) {
+  const ids = firstPage.map((f) => f.reviewer.id);
+  if (firstPage.length < PAGE) return ids;
+  for (let offset = PAGE; ; offset += PAGE) {
+    const data = await graphql(
+      `query More($agentId: String!, $offset: Int!) {
+         Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
+           reviewer_id
+         }
+       }`,
+      { agentId, offset },
+    );
+    const rows = data.Feedback || [];
+    // Verified against the live endpoint 2026-09-23: both Feedback.reviewer_id
+    // and Feedback.reviewer.id are the bare lowercase address, with no chain
+    // prefix, so the two pages produce the same shape of id and can be deduped
+    // against each other directly.
+    for (const r of rows) ids.push(r.reviewer_id);
+    if (rows.length < PAGE) return ids;
+    // A malformed response that keeps returning full pages must not spin
+    // forever against a public endpoint.
+    if (offset > 50000) return ids;
+  }
+}
+
 async function checkAgent() {
   const agentId = document.getElementById("agentId").value.trim();
   if (!agentId) return;
@@ -535,7 +567,7 @@ async function checkAgent() {
     // and one wallet already has 19 entries on a single agent, so the raw
     // list would send the same address to the query many times over.
     const reviewerIds = agent
-      ? Array.from(new Set(agent.feedbacks.map((f) => f.reviewer.id)))
+      ? Array.from(new Set(await allReviewerIds(agentId, agent.feedbacks)))
       : [];
     const walletDetail = reviewerIds.length > 0
       ? await graphql(walletDetailQuery(reviewerIds), {
