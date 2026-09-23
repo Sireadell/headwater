@@ -49,7 +49,22 @@ quest where people were paid to try an agent. I am not accusing anyone.
 The point is that it renders in a registry as a popular agent, and
 nothing tells you it was a campaign."
 
-**[1:00-1:40] Agents 153 to 158, the honest part.**
+**[1:00-1:20] Agent 182, the round trip.**
+
+"Watch the money on agent 182. The owner sends a wallet eleven MON. That
+wallet rates the agent fourteen seconds later. Six seconds after that it
+sends ten point nine three back to the same owner."
+
+"All 7,665 of them do that. The money left the owner and came back to the
+owner, with a five star rating created in between."
+
+"I should say plainly that I am not first to this. Another team in this
+hackathon found the same loop, and their independent count and mine agree
+exactly at three. Two separate pipelines reading the same chain and
+getting the same number is worth more to you than either of us claiming
+it alone."
+
+**[1:20-1:50] Agents 153 to 158, the honest part.**
 
 "These six looked like the most suspicious thing on the chain. Six
 agents, six different owners, and one of those owners paid five MON to
@@ -65,7 +80,7 @@ results."
 what it meant. That is exactly why the product says what a score is made
 of instead of passing judgement on it."
 
-**[1:40-2:20] Lookup page, run a live check.**
+**[1:50-2:20] Lookup page, run a live check.**
 
 Type an agent number and hit Check.
 
@@ -80,12 +95,17 @@ shaped, game generated, or nothing to go on."
 **[2:20-2:50] Methodology page.**
 
 "Everything is written down here, including what does not work. The
-wallet reputation check is dead, so it reads NOT ACTIVE rather than
-showing a clean pass on a check that never ran."
+wallet reputation check reads NOT ACTIVE rather than showing a clean
+pass on a check that never ran. I assumed that was because there is no
+label data for Monad. I checked, and I was wrong: Nansen does cover
+Monad, at a hundredth of a cent per call. We were calling an endpoint
+that does not exist. I have not bought a single call, so the check stays
+off and says so."
 
-"And one wallet on Monad has funded 7,665 others. If I did not exclude
-it, every agent on the chain would look connected, and the tool would
-appear to work while telling you nothing."
+"And I nearly got the biggest thing on this chain backwards. One wallet
+funded 7,665 others, which is the shape of a faucet, so I excluded it to
+stop it flagging every agent. That wallet is agent 182's own owner. The
+rule protecting me from false positives was hiding the finding."
 
 **[2:50-3:00] Close.**
 
@@ -145,7 +165,13 @@ switched off. That's Headwater. Thanks for watching."
 Every figure was measured against the live indexer on 2026-09-22. Do not
 round them and do not add any that are not here.
 
-- 10,254 agents registered on Monad mainnet
+- 10,254 agents registered as measured on 2026-09-22. The chain keeps
+  moving and the live API reads 10,256 today, so say "more than ten
+  thousand" on camera rather than a figure that drifts
+- Agent 182 round trip: 11.000000 MON out, rating 14 seconds later,
+  10.934585768 MON back 6 seconds after that, all 7,665 raters
+- 3 of 7,771 agent-rater pairs chain-wide show a payment before rating
+  with no owner funding. Another team measured 3 independently
 - 84 of them have any feedback at all
 - 9,188 feedback records in total
 - Agent 182 has 7,665 distinct reviewers, 83% of all feedback
@@ -168,4 +194,7 @@ round them and do not add any that are not here.
 - The 73 percent figure from the arXiv study. That was measured on
   Ethereum, BSC and Base, not Monad, and our own Monad data does not
   support it
+- That the round trip is our discovery. Another team published it first
+- That Nansen has no Monad coverage. It does, and a judge from Nansen is
+  on the panel
 - Any number that is not in the list above
