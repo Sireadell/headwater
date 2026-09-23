@@ -231,3 +231,29 @@ a:hover { color: var(--accent-hover); }
     padding-left: 20px; padding-right: 20px;
   }
 }
+
+/* Provenance verdict. Sits above the signal breakdown because it is the
+   only judgement on the page derived from money movement rather than from
+   review behaviour. The left border carries the tone so the card reads at a
+   glance without relying on the badge alone. */
+.prov-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--text-faint);
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.prov-red { border-left-color: var(--red); }
+.prov-amber { border-left-color: var(--amber); }
+.prov-mut { border-left-color: var(--text-faint); }
+.prov-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.prov-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.prov-summary { font-size: 14px; line-height: 1.65; color: var(--text-dim); margin: 0 0 12px; }
+.prov-findings { margin: 0 0 12px; padding-left: 18px; }
+.prov-findings li { font-size: 13.5px; line-height: 1.6; color: var(--text-dim); margin-bottom: 6px; }
+.prov-basis { font-size: 11.5px; color: var(--text-faint); margin: 0; letter-spacing: 0.01em; }
+
+@media (max-width: 640px) {
+  .prov-card { padding: 16px; }
+}

@@ -199,7 +199,7 @@ function renderError(message) {
   document.getElementById("results").innerHTML = `<div class="error-state">Query failed: ${message}</div>`;
 }
 
-function renderAgent(agentId, agent, walletDetail) {
+function renderAgent(agentId, agent, walletDetail, provenance) {
   if (!agent) {
     document.getElementById("results").innerHTML = `<div class="empty-state">No agent found with id ${agentId}.</div>`;
     return;
@@ -442,7 +442,32 @@ function renderAgent(agentId, agent, walletDetail) {
     },
   ];
 
-  document.getElementById("results").innerHTML = `
+  // The provenance verdict leads, because it is the only part of this page
+  // computed from money movement rather than from review behaviour, and it is
+  // the part that survived being wrong. Everything below it is supporting
+  // detail. It renders even when the trace failed, saying so, rather than
+  // quietly leaving a gap that reads as a clean result.
+  const prov = provenance
+    ? `
+    <div class="prov-card prov-${provenance.verdict.tone}">
+      <div class="prov-head">
+        <span class="badge badge-${provenance.verdict.tone} mono">${provenance.verdict.label}</span>
+        <span class="prov-title">Where this agent's reputation came from</span>
+      </div>
+      <p class="prov-summary">${provenance.verdict.summary}</p>
+      ${provenance.verdict.findings.length > 0 ? `<ul class="prov-findings">${provenance.verdict.findings.map((f) => `<li>${f}</li>`).join("")}</ul>` : ""}
+      <p class="prov-basis mono">Traced ${provenance.funding.tracedRaters} rater${provenance.funding.tracedRaters === 1 ? "" : "s"} over two funding hops. ${provenance.raterTypes.sampled} of ${provenance.raterTypes.total} checked for contract code.</p>
+    </div>`
+    : `
+    <div class="prov-card prov-mut">
+      <div class="prov-head">
+        <span class="badge badge-mut mono">NOT TRACED</span>
+        <span class="prov-title">Where this agent's reputation came from</span>
+      </div>
+      <p class="prov-summary">The funding trace did not complete for this agent, so no provenance verdict is shown. This is a missing answer, not a clean one.</p>
+    </div>`;
+
+  document.getElementById("results").innerHTML = prov + `
     <div class="lookup-body">
       <div class="agent-panel">
         <div class="info-card">
@@ -532,7 +557,35 @@ async function checkAgent() {
         )).Agent
       : [];
 
-    renderAgent(agentId, agent, walletDetail);
+    // Provenance runs last and is allowed to fail on its own. It makes
+    // RPC calls to a public endpoint that the rest of the page does not
+    // depend on, and a rate limit there must not blank out signals that
+    // already loaded successfully.
+    let provenance = null;
+    if (agent) {
+      try {
+        const raterAddrs = reviewerIds.map((id) => id.toLowerCase());
+        const funding = await traceOwnerFunding(agent.owner, raterAddrs);
+        const raterTypes = await classifyRaters(raterAddrs);
+        const selfRated = raterAddrs.includes(agent.owner.toLowerCase()) ? 1 : 0;
+        provenance = {
+          funding,
+          raterTypes,
+          verdict: buildVerdict({
+            owner: agent.owner,
+            reviewers: reviewerIds,
+            feedbackCount: agent.feedbacks.length,
+            funding,
+            raterTypes,
+            selfRated,
+          }),
+        };
+      } catch (provErr) {
+        console.warn("provenance trace failed:", provErr.message);
+      }
+    }
+
+    renderAgent(agentId, agent, walletDetail, provenance);
   } catch (err) {
     renderError(err.message);
   }
