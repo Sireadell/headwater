@@ -1,0 +1,35 @@
+{
+  "agentId": "10221",
+  "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
+  "agentURI": "https://execution.market/workers/0x9688385469cd5d216fd5a89eb03ec7fd0e0bd92d",
+  "registeredAt": 1787540901,
+  "verdict": "SELF REVIEWED",
+  "tone": "red",
+  "summary": "The wallet that owns this agent is among the wallets rating it.",
+  "findings": [
+    "The owner's own wallet is among the raters.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 1,
+    "distinctRaters": 1,
+    "selfRated": true,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 1,
+    "ratersTraced": 1,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:03:16.677Z"
+}

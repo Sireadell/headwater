@@ -1,0 +1,623 @@
+{
+  "what": "Where each ERC-8004 agent's reputation on Monad actually came from. A verdict describes the origin of the money behind an agent's raters. It is not a judgement of anyone's intent, and a funded campaign can be entirely legitimate.",
+  "usage": {
+    "agent": "GET /headwater/api/agents/{agentId}.json",
+    "absent": "An agent id with no file here has never been rated. Treat that as the verdict NO EVIDENCE, not as an error: it is the normal case on this chain.",
+    "live": "This is a static snapshot, as fresh as generatedAt below. For a live answer run the MCP server at mcp/server.mjs, which applies the same rules against the indexer directly."
+  },
+  "verdicts": {
+    "NO EVIDENCE": "Never rated. Nothing to trust or distrust.",
+    "THIN": "Every rating came from a single address.",
+    "SELF REVIEWED": "The owner's own wallet is among the raters.",
+    "APP GENERATED": "Raters are application contracts recording outcomes, not people.",
+    "OWNER FUNDED": "The agent's own owner paid for its raters, directly or via one hop.",
+    "NO LINK FOUND": "No funding link found across two hops. Weaker evidence than a link."
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "note": "Funding moved by an internal contract call does not appear in top-level transactions, so absence of a link is weaker evidence than a link."
+  },
+  "counts": {
+    "agentsRegistered": 10256,
+    "agentsEverRated": 84,
+    "byVerdict": {
+      "OWNER FUNDED": 18,
+      "THIN": 51,
+      "APP GENERATED": 6,
+      "SELF REVIEWED": 9
+    }
+  },
+  "agents": [
+    {
+      "agentId": "182",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 7665,
+      "feedbackCount": 7665,
+      "ownerFunded": 7665
+    },
+    {
+      "agentId": "9",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 518,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "87",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 508,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8317",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 78,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "4",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 3,
+      "feedbackCount": 76,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "153",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 5,
+      "feedbackCount": 53,
+      "ownerFunded": 2
+    },
+    {
+      "agentId": "10182",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 42,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10181",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 19,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "154",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 4,
+      "feedbackCount": 13,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8348",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 12,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "156",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 4,
+      "feedbackCount": 11,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "155",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 4,
+      "feedbackCount": 10,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "157",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 5,
+      "feedbackCount": 10,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "2106",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 10,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8354",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 10,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8355",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 10,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "146",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 9,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "158",
+      "verdict": "APP GENERATED",
+      "distinctRaters": 4,
+      "feedbackCount": 9,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10180",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 7,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8353",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 7,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "145",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 6,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8349",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8350",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8351",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8352",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8365",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8393",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "8394",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "6238",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 3,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 3,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "10248",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "141",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "143",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "150",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "160",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "18",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 2,
+      "feedbackCount": 2,
+      "ownerFunded": 2
+    },
+    {
+      "agentId": "5779",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7222",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7753",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8366",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 2,
+      "ownerFunded": 1
+    },
+    {
+      "agentId": "1",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10153",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10168",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10169",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10183",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10219",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10221",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10223",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "118",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "129",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "142",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "1829",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "2",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "2363",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "2422",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "3",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "3156",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "4078",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "4442",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "4557",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "4993",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5117",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5169",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5205",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5240",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5329",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5710",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5720",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "5957",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "6149",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "6618",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "6858",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "6906",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7362",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7537",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7657",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7828",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7829",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "7889",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8095",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8216",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8220",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8357",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "8358",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    }
+  ],
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:04:28.957Z"
+}

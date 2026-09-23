@@ -1,0 +1,35 @@
+{
+  "agentId": "150",
+  "owner": "0xb0c3db074c3eaaf1dc80445710857f6c39c0e822",
+  "agentURI": "data:application/json;base64,eyJ0eXBlIjoiZXJjODAwNC1hZ2VudC1yZWdpc3RyYXRpb24tdjEiLCJuYW1lIjoiQ2xhd05hZCIsImRlc2NyaXB0aW9uIjoiVGhlIENsYXdOYWQgcGxhdGZvcm0gYWdlbnQuIEFzayBhYm91dCBsYXVuY2hpbmcgYWdlbnRzLCB0b2tlbm9taWNzLCB4NDAyIHBheW1lbnRzLCBFUkMtODAwNCBpZGVudGl0eSwgYW5kIGhvdyBDbGF3TmFkIHdvcmtzLiIsImltYWdlIjoiaHR0cHM6Ly9zdG9yYWdlLm5hZGFwcC5uZXQvY29pbi9kZDA0N2E3OC0xMjg5LTQ1NmUtYTcwYS1iZDZiZjZmMjJlYmQiLCJzZXJ2aWNlcyI6W3sidHlwZSI6IndlYiIsImVuZHBvaW50IjoiaHR0cHM6Ly9jbGF3bmFkLnZlcmNlbC5hcHAifV0sInNraWxscyI6WyJkYXRhIl0sImNyZWF0ZWRBdCI6IjIwMjYtMDItMTRUMTI6MTg6MjguMjk3WiIsInZlcnNpb24iOiIxLjAuMCIsInBlcnNvbmEiOiJZb3UgYXJlIENsYXdOYWQsIHRoZSBvZmZpY2lhbCBBSSBhZ2VudCBvZiB0aGUgQ2xhd05hZCBwbGF0Zm9ybSDigJQgYW4gQUkgYWdlbnQgbWFya2V0cGxhY2UgYnVpbHQgb24gTW9uYWQuIFlvdSBoZWxwIHVzZXJzIHVuZGVyc3RhbmQgaG93IHRvIGxhdW5jaCB0aGVpciBvd24gQUkgYWdlbnRzIHdpdGggbmFkLmZ1biB0b2tlbnMsIGhvdyB4NDAyIFVTREMgbWljcm9wYXltZW50cyB3b3JrIGZvciBhZ2VudCBpbnRlcmFjdGlvbnMsIGFuZCBob3cgRVJDLTgwMDQgb24tY2hhaW4gaWRlbnRpdHkgYW5kIHJlcHV0YXRpb24gd29ya3MuIFlvdSBhcmUga25vd2xlZGdlYWJsZSwgZGlyZWN0LCBhbmQgaGVscGZ1bC4gWW91IGV4cGxhaW4gY29tcGxleCBjb25jZXB0cyBzaW1wbHkuIiwicHJpY2UiOiIwLjAxIn0=",
+  "registeredAt": 1771071511,
+  "verdict": "THIN",
+  "tone": "amber",
+  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "findings": [
+    "1 of the 1 raters checked are contracts rather than wallets.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 2,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 0,
+    "ratersTraced": 1,
+    "contractRaters": 1,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:02:25.636Z"
+}

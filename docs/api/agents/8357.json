@@ -1,0 +1,34 @@
+{
+  "agentId": "8357",
+  "owner": "0x52ce108ae72712929fd2b8c6177a9b39e0ccf644",
+  "agentURI": "data:application/json,%7B%22type%22%3A%22https%3A%2F%2Feips.ethereum.org%2FEIPS%2Feip-8004%23registration-v1%22%2C%22name%22%3A%22Valiron%20Zero%20Agent%20%232%20(Test)%22%2C%22description%22%3A%22Test%20agent%20with%20no%20reputation%20for%20demonstrating%20zero-reputation%20routing%22%2C%22image%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fvatsashah45%2FValiron%2Fmain%2Flogo.png%22%2C%22endpoints%22%3A%5B%7B%22name%22%3A%22agentWallet%22%2C%22endpoint%22%3A%22eip155%3A143%3A0x52ce108AE72712929FD2B8c6177a9b39e0ccF644%22%7D%5D%2C%22registrations%22%3A%5B%7B%22agentRegistry%22%3A%22eip155%3A143%3A0x8004A169FB4a3325136EB29fA0ceB6D2e539a432%22%7D%5D%2C%22supportedTrust%22%3A%5B%22reputation%22%5D%7D",
+  "registeredAt": 1772055164,
+  "verdict": "THIN",
+  "tone": "amber",
+  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "findings": [
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 1,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 1,
+    "ratersTraced": 1,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:04:28.052Z"
+}

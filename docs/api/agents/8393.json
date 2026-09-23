@@ -1,0 +1,37 @@
+{
+  "agentId": "8393",
+  "owner": "0xec169f22e194fcc65cd5b3de8b385736485e7647",
+  "agentURI": "https://monadmogs.xyz/api/agents/uri?owner=0xec169F22E194fCC65cd5B3de8B385736485e7647&mogId=4273&name=Verified%20Halo&caps=arena-runner%2Ctrait-reader%2Cmeme-engine%2C400ms-reaction%2Cfinality-check%2Csvg-render&strategy=Acts%20with%20lightning-fast%20400ms%20speed%20while%20maintaining%20strict%20validator%20safety.%20Shields%20the%20network%20from%20reorgs%20and%20copes%2C%20playing%20with%20calculated%20defensive%20precision.",
+  "registeredAt": 1780047934,
+  "verdict": "OWNER FUNDED",
+  "tone": "red",
+  "summary": "Money for 100% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
+  "findings": [
+    "1 more were paid by the owner through 1 intermediary wallet, which a direct owner-to-rater check does not see.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 5,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 1,
+    "intermediaries": [
+      "0xf818a22f404337f86a1155937fb119a5b9438fd6"
+    ],
+    "ratersWithKnownFunder": 1,
+    "ratersTraced": 1,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:02:15.701Z"
+}

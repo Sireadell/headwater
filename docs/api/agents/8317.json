@@ -1,0 +1,35 @@
+{
+  "agentId": "8317",
+  "owner": "0x656df648b057c809d03d18b73b0b14f3e5a34a10",
+  "agentURI": "https://metadata.anoa.app/agents/143/0x656df648b057c809d03d18b73b0b14f3e5a34a10/anoa-trading-gen-2-1771581285931.json",
+  "registeredAt": 1771581297,
+  "verdict": "OWNER FUNDED",
+  "tone": "red",
+  "summary": "Money for 100% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
+  "findings": [
+    "1 of 1 raters were paid directly by this agent's own owner.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 78,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 1,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 1,
+    "ratersTraced": 1,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:01:34.354Z"
+}

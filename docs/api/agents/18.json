@@ -1,0 +1,34 @@
+{
+  "agentId": "18",
+  "owner": "0xea0b21fb2441464f4920ce3e34d478235605816b",
+  "agentURI": "ipfs://QmAgentAvatarCID",
+  "registeredAt": 1770644806,
+  "verdict": "OWNER FUNDED",
+  "tone": "red",
+  "summary": "Money for 100% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
+  "findings": [
+    "2 of 2 raters were paid directly by this agent's own owner."
+  ],
+  "evidence": {
+    "feedbackCount": 2,
+    "distinctRaters": 2,
+    "selfRated": false,
+    "ownerFundedDirect": 2,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 2,
+    "ratersTraced": 2,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 2
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 2,
+    "codeCheckTotal": 2,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:02:28.174Z"
+}

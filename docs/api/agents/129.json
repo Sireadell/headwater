@@ -1,0 +1,35 @@
+{
+  "agentId": "129",
+  "owner": "0xb541a987b9b217e6336f9080bbec5630bf3e8dde",
+  "agentURI": "https://clawnad.dev/agents/orchestrator.json",
+  "registeredAt": 1770989326,
+  "verdict": "THIN",
+  "tone": "amber",
+  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "findings": [
+    "1 of the 1 raters checked are contracts rather than wallets.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 1,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 0,
+    "ratersTraced": 1,
+    "contractRaters": 1,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:03:26.378Z"
+}

@@ -1,0 +1,35 @@
+{
+  "agentId": "8358",
+  "owner": "0xb0c3db074c3eaaf1dc80445710857f6c39c0e822",
+  "agentURI": "data:application/json;base64,eyJ0eXBlIjoiZXJjODAwNC1hZ2VudC1yZWdpc3RyYXRpb24tdjEiLCJuYW1lIjoiQWxhbmNocnV6aCBCb3QiLCJkZXNjcmlwdGlvbiI6IkFsYW5jaHJ1emggUGVyc29uYWwgQm90IiwiaW1hZ2UiOiJodHRwczovL3N0b3JhZ2UubmFkYXBwLm5ldC9jb2luLzdhYmI1ZWU1LWQyNWUtNDkwNS04NmVlLWFkMjU3NTRkODFjMyIsInNlcnZpY2VzIjpbeyJ0eXBlIjoid2ViIiwiZW5kcG9pbnQiOiJodHRwczovL2NsYXduYWQudmVyY2VsLmFwcCJ9XSwic2tpbGxzIjpbImRlZmkiXSwiY3JlYXRlZEF0IjoiMjAyNi0wMi0yOFQyMTo0NjoxMS44ODRaIiwidmVyc2lvbiI6IjEuMC4wIiwicGVyc29uYSI6IllvdSBhcmUgQUkgd2l0aCBvd24gaW50ZWxlZ2VuY2UgYW5kIGtub3cgYWJvdXQgbWFya2V0IGNyeXB0b2N1cnJlbm5jeS4gRm9jdXMgb24gSHlwZXJsaXF1aWQgYW5kIG1vbmFkIGVjb3N5c3RlbSIsInByaWNlIjoiMCJ9",
+  "registeredAt": 1772315177,
+  "verdict": "THIN",
+  "tone": "amber",
+  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "findings": [
+    "1 of the 1 raters checked are contracts rather than wallets.",
+    "Every rating came from one single address."
+  ],
+  "evidence": {
+    "feedbackCount": 1,
+    "distinctRaters": 1,
+    "selfRated": false,
+    "ownerFundedDirect": 0,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 0,
+    "ratersTraced": 1,
+    "contractRaters": 1,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 1
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 1,
+    "codeCheckTotal": 1,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:04:28.954Z"
+}

@@ -72,3 +72,70 @@ node scripts/generateScoreboardPage.mjs
 
 Regenerates `docs/scoreboard.html`, a static page version of the same
 thing, open it directly in a browser.
+
+## Calling Headwater from an agent
+
+Monad's ERC-8004 documentation tells agents to check reputation before a
+high-value transaction. The registry answers "what is the score". It does not
+answer "is that score worth anything", which on Monad is the question that
+matters: of 10,254 registered agents, 84 have ever been rated, and the single
+most-rated agent had all 7,665 of its raters funded by its own owner.
+
+There are two ways to ask.
+
+### Static JSON API
+
+No key, no rate limit, no server. As fresh as the last build.
+
+```
+GET https://sireadell.github.io/headwater/api/index.json
+GET https://sireadell.github.io/headwater/api/agents/182.json
+```
+
+An agent id with no file has never been rated. That is the verdict
+`NO EVIDENCE`, not an error, and it is the normal case on this chain.
+
+### MCP server
+
+Answers live against the indexer, and covers every agent rather than only the
+rated ones. No dependencies.
+
+```json
+{
+  "mcpServers": {
+    "headwater": {
+      "command": "node",
+      "args": ["/absolute/path/to/headwater/mcp/server.mjs"]
+    }
+  }
+}
+```
+
+One tool, `check_agent_reputation`, taking an `agentId`.
+
+### Verdicts
+
+| Verdict | Meaning |
+|---|---|
+| `NO EVIDENCE` | Never rated. Nothing to trust or distrust |
+| `THIN` | Every rating came from a single address |
+| `SELF REVIEWED` | The owner's own wallet is among the raters |
+| `APP GENERATED` | Raters are application contracts recording outcomes, not people |
+| `OWNER FUNDED` | The owner paid for its raters, directly or through one intermediary |
+| `NO LINK FOUND` | No funding link across two hops. Weaker evidence than a link would be |
+
+### What a verdict does not say
+
+It describes where money came from. It is not a judgement of intent, and a
+funded campaign can be entirely legitimate. Agents 153 to 158 read as a
+coordinated ring until the rating contracts are decoded and turn out to expose
+`createGame`, `games` and `getRound`: every transaction carries one positive
+and one negative score, which is a winner and a loser. They are classified
+`APP GENERATED` for that reason.
+
+Funding is traced over two hops in native MON. Money moved by an internal
+contract call does not appear in top-level transactions, so the absence of a
+link is weaker evidence than a link.
+
+The page, the JSON API and the MCP server all read the same rules from
+`docs/provenance.js`, so they cannot answer the same question differently.

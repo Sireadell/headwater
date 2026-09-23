@@ -1,0 +1,35 @@
+{
+  "agentId": "4",
+  "owner": "0x734b0e337bfa7d4764f4b806b4245dd312ddf134",
+  "agentURI": "https://grokandmon.com/.well-known/agent-registration.json",
+  "registeredAt": 1770248270,
+  "verdict": "OWNER FUNDED",
+  "tone": "amber",
+  "summary": "Money for 33% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
+  "findings": [
+    "1 of 3 raters were paid directly by this agent's own owner.",
+    "1 of the 3 raters checked are contracts rather than wallets."
+  ],
+  "evidence": {
+    "feedbackCount": 76,
+    "distinctRaters": 3,
+    "selfRated": false,
+    "ownerFundedDirect": 1,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 3,
+    "ratersTraced": 3,
+    "contractRaters": 1,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 3
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 3,
+    "codeCheckTotal": 3,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:01:37.060Z"
+}

@@ -1,0 +1,38 @@
+{
+  "agentId": "153",
+  "owner": "0x6ccbe5f5cf80f66a0ef286287e2a75e4afec7fbf",
+  "agentURI": null,
+  "registeredAt": 1771089663,
+  "verdict": "APP GENERATED",
+  "tone": "mut",
+  "summary": "These scores were written by application contracts recording outcomes, not by people forming opinions. That is the standard being used as designed. It is not a warning, but the score measures results inside one application rather than a general reputation, and it should not be read as customers vouching for this agent. The owner has also funded raters here, which for an application contract usually means paying its gas rather than buying an opinion.",
+  "findings": [
+    "1 of 5 raters were paid directly by this agent's own owner.",
+    "1 more were paid by the owner through 1 intermediary wallet, which a direct owner-to-rater check does not see.",
+    "4 of the 5 raters checked are application contracts, not people. They expose createGame(uint256), games(uint256), getRound(uint256,uint256), so these scores are outcomes recorded by software."
+  ],
+  "evidence": {
+    "feedbackCount": 53,
+    "distinctRaters": 5,
+    "selfRated": false,
+    "ownerFundedDirect": 1,
+    "ownerFundedViaIntermediary": 1,
+    "intermediaries": [
+      "0x37d06c086c9dfc48205d777b0159680ade7fefe1"
+    ],
+    "ratersWithKnownFunder": 2,
+    "ratersTraced": 5,
+    "contractRaters": 4,
+    "applicationRaters": 4,
+    "ratersCheckedForCode": 5
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 5,
+    "codeCheckTotal": 5,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:01:38.850Z"
+}

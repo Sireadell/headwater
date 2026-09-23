@@ -1,0 +1,34 @@
+{
+  "agentId": "182",
+  "owner": "0x97cd97cfe21799bacbf39d0a53469e5f82f30996",
+  "agentURI": "https://eve-8004.vercel.app/metadata/m.json",
+  "registeredAt": 1771175509,
+  "verdict": "OWNER FUNDED",
+  "tone": "red",
+  "summary": "Money for 100% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
+  "findings": [
+    "7665 of 7665 raters were paid directly by this agent's own owner."
+  ],
+  "evidence": {
+    "feedbackCount": 7665,
+    "distinctRaters": 7665,
+    "selfRated": false,
+    "ownerFundedDirect": 7665,
+    "ownerFundedViaIntermediary": 0,
+    "intermediaries": [],
+    "ratersWithKnownFunder": 7665,
+    "ratersTraced": 7665,
+    "contractRaters": 0,
+    "applicationRaters": 0,
+    "ratersCheckedForCode": 40
+  },
+  "limits": {
+    "fundingHops": 2,
+    "fundingAsset": "native MON only",
+    "codeCheckSample": 40,
+    "codeCheckTotal": 7665,
+    "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
+  },
+  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
+  "generatedAt": "2026-09-23T09:01:30.934Z"
+}
