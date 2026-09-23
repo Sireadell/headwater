@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Headwater — Home</title>
+<title>Headwater · Home</title>
 <meta name="description" content="Independent funding-provenance audit for ERC-8004 agent reputation on Monad.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,9 +28,9 @@
 
   <section class="hero">
     <div class="hero-inner">
-      <div class="eyebrow mono">Independent funding-provenance audit &middot; ERC-8004 on Monad</div>
-      <h1 class="disp hero-title">Reviews can be faked. Money can&rsquo;t lie as easily.</h1>
-      <p class="hero-sub">An empirical study of ERC-8004 across Ethereum, BSC and Base found most reviewer activity was Sybil-coordinated, not real. Headwater traces who actually funded whom &mdash; not just who left a review &mdash; to catch the pattern the current wallet-age screen structurally misses.</p>
+      <div class="eyebrow mono">ERC-8004 reputation context &middot; Monad mainnet</div>
+      <h1 class="disp hero-title">A reputation score is a number with no units.</h1>
+      <p class="hero-sub">ERC-8004 gives an agent a score, and Monad&rsquo;s own docs tell agents to check it before a high-value transaction. Nothing tells you what that score is made of. Headwater indexes every agent on Monad and traces the funding behind every reviewer, so you can see whether a score is broad, thin, self-written, campaign-funded or produced by a game.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="lookup.html">Look up an agent</a>
         <a class="btn btn-ghost" href="methodology.html">Read the honesty table</a>
@@ -40,61 +40,61 @@
 
   <section class="stats">
     <div class="stat">
-      <div class="stat-num mono disp">250+</div>
-      <div class="stat-label">registered agents scanned live on Monad mainnet</div>
+      <div class="stat-num mono disp">10,254</div>
+      <div class="stat-label">agents registered on Monad mainnet, all indexed</div>
     </div>
     <div class="stat">
-      <div class="stat-num mono disp">7,690</div>
-      <div class="stat-label">wallets that have reviewed an agent, every one of them checked</div>
+      <div class="stat-num mono disp">84</div>
+      <div class="stat-label">of them have received a single review between them</div>
     </div>
     <div class="stat">
-      <div class="stat-num mono disp">full</div>
-      <div class="stat-label">funding history traced per wallet, back to its first transaction</div>
+      <div class="stat-num mono disp">83%</div>
+      <div class="stat-label">of all feedback on the chain sits on one agent</div>
     </div>
     <div class="stat">
-      <div class="stat-num mono disp">1</div>
-      <div class="stat-label">real coordinated cluster, found live</div>
+      <div class="stat-num mono disp">7,665</div>
+      <div class="stat-label">of that agent&rsquo;s reviewers were funded by one wallet</div>
     </div>
   </section>
 
   <section class="finding">
     <div class="finding-head">
-      <h2 class="disp">Live finding &mdash; agents 153&ndash;158</h2>
-      <a href="lookup.html">Inspect this cluster &rarr;</a>
+      <h2 class="disp">What ERC-8004 reputation on Monad is actually made of</h2>
+      <a href="lookup.html">Check any agent &rarr;</a>
     </div>
     <div class="table">
       <div class="table-head">
-        <div class="col col-wallet mono">REVIEWER WALLET</div>
-        <div class="col col-agents mono">AGENTS REVIEWED</div>
-        <div class="col col-signal mono">SIGNAL</div>
+        <div class="col col-wallet mono">AGENTS</div>
+        <div class="col col-agents mono">WHAT THE SCORE IS BUILT FROM</div>
+        <div class="col col-signal mono">CONTEXT</div>
       </div>
       <div class="table-row">
-        <div class="col col-wallet mono">0x4a91...e2c7</div>
-        <div class="col col-agents mono">Agents 153, 155, 156</div>
-        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+        <div class="col col-wallet mono">10,170</div>
+        <div class="col col-agents">No reviews at all</div>
+        <div class="col col-signal"><span class="badge badge-mut mono">NO EVIDENCE</span></div>
       </div>
       <div class="table-row">
-        <div class="col col-wallet mono">0x8f03...9b14</div>
-        <div class="col col-agents mono">Agents 153, 154, 157</div>
-        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+        <div class="col col-wallet mono">75</div>
+        <div class="col col-agents">Every review came from one single address</div>
+        <div class="col col-signal"><span class="badge badge-amber mono">THIN</span></div>
       </div>
       <div class="table-row">
-        <div class="col col-wallet mono">0x2c6e...a071</div>
-        <div class="col col-agents mono">Agents 154, 156, 158</div>
-        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+        <div class="col col-wallet mono">9</div>
+        <div class="col col-agents">Reviewed by the wallet that owns them</div>
+        <div class="col col-signal"><span class="badge badge-amber mono">SELF-REVIEWED</span></div>
       </div>
       <div class="table-row">
-        <div class="col col-wallet mono">0x71bd...3f42</div>
-        <div class="col col-agents mono">Agents 155, 157, 158</div>
-        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+        <div class="col col-wallet mono">153&ndash;158</div>
+        <div class="col col-agents">Scores written by game contracts recording match results</div>
+        <div class="col col-signal"><span class="badge badge-mut mono">GAME-GENERATED</span></div>
       </div>
       <div class="table-row">
-        <div class="col col-wallet mono">0xd928...c6e0</div>
-        <div class="col col-agents mono">Agents 153, 156, 158</div>
-        <div class="col col-signal"><span class="badge badge-red mono">CROSS-AGENT</span></div>
+        <div class="col col-wallet mono">182</div>
+        <div class="col col-agents">7,665 reviewers, every one funded by the same wallet</div>
+        <div class="col col-signal"><span class="badge badge-amber mono">CAMPAIGN-SHAPED</span></div>
       </div>
     </div>
-    <p class="footnote">Observed live on Monad mainnet, 2026-09-16. Cross-agent overlap alone is not proof of fraud &mdash; a real user can legitimately review several products. See Methodology for what this signal does and does not establish on its own.</p>
+    <p class="footnote">Measured live on Monad mainnet, 2026-09-22, across all 10,254 registered agents. None of this is an accusation. A funded campaign can be a legitimate quest, and a game contract reporting wins and losses is the standard working exactly as designed. The point is that all five of these render as the same kind of number in a registry, and nothing today tells them apart.</p>
   </section>
 
 </div>

@@ -1,193 +1,171 @@
 # Video scripts
 
-Two scripts for the two required submission videos, written to be read
-aloud. Say them in your own words rather than reciting them. The order of
-the argument is what matters, not the exact wording.
-
-Do not film until the live site is confirmed showing the owner-funding
-signal. The whole demo rests on it.
+Two scripts for the two submission videos, written to be read aloud. Say
+them in your own words. The order of the argument is what matters, not
+the exact wording.
 
 ## The one thing to get right
 
-Do not say the word fraud, and do not call these people scammers.
+Headwater is not a fraud detector and you must not present it as one.
 
-Everything in these scripts is true and checkable. Intent is not. The
-same on-chain pattern would be produced by one developer testing their
-own agents, and a judge who knows this space will think exactly that. If
-you claim fraud you invite an argument you cannot win, because you cannot
-prove what was in someone's head.
+An earlier version of these scripts claimed six agents were caught
+manipulating reviews. That claim was checked properly and it was wrong.
+The reviewers were game contracts, and the paired scores were match
+results, a winner and a loser. If you say fraud, a judge reads the
+contract and your submission is finished.
 
-Claim provenance instead. "These six agents are not independent, and here
-is the transaction that proves it" is unarguable. It is also the more
-interesting claim, because it means the registry's reputation score
-cannot be taken at face value regardless of anyone's motives.
-
----
+What you have is better and it cannot be argued with, because it is a
+census rather than an accusation. Monad tells developers to put agent
+reputation on chain. You indexed all of it and measured what is actually
+there. The answer is that almost nothing is there, and what exists is
+made of things nobody can see from the score.
 
 ## Technical demo (max 3 minutes)
 
-Must show the live working product. Screen-record the real site.
+Screen-record the live site.
 
-**[0:00-0:20] Home page.**
+**[0:00-0:25] Home page.**
 
-"This is Headwater. ERC-8004 lets an AI agent carry a reputation on
-chain, so you can check its reviews before trusting it. The problem is
-that anyone can make a wallet and write a review. So I wanted to know
-whether the reviews on Monad are actually coming from independent people."
+"This is Headwater. ERC-8004 gives an AI agent a reputation score on
+chain, and Monad's own documentation tells agents to check that score
+before a high-value transaction."
 
-"It reads live from Monad mainnet. Seven thousand six hundred and ninety
-wallets have reviewed an agent, and it checks every one of them."
+"So I indexed every agent on Monad to see what those scores are made of.
+There are 10,254 of them. Eighty four have received a single review
+between them. Everything else has no reputation at all."
 
-**[0:20-0:50] Agent Lookup, type 153, hit Check.**
+**[0:25-1:00] The breakdown table.**
 
-"Here's a real one. Agent 153. It has reviews. It looks fine."
+"Of the eighty four that do have reviews, seventy five got every single
+review from one address. Nine were reviewed by the wallet that owns
+them."
 
-Point at the first signal, Owner funded other agents.
+"One agent, number 182, holds 83 percent of all the feedback on the
+chain. It has 7,665 reviewers. I traced the funding behind them and
+every one was paid for by the same wallet."
 
-"This is what the tool found. The wallet that owns this agent paid for
-the wallets that own agents 154, 155, 156, 157 and 158. Five other
-agents, five different owner addresses, which is exactly what makes them
-look independent when you scroll a registry."
+"I want to be careful here. That is very likely a legitimate campaign, a
+quest where people were paid to try an agent. I am not accusing anyone.
+The point is that it renders in a registry as a popular agent, and
+nothing tells you it was a campaign."
 
-"That isn't guessed from behaviour. It's a transaction. Five MON to each
-one, all inside about a minute."
+**[1:00-1:40] Agents 153 to 158, the honest part.**
 
-**[0:50-1:10] The reviewer that ties it together.**
+"These six looked like the most suspicious thing on the chain. Six
+agents, six different owners, and one of those owners paid five MON to
+each of the other five before any of them registered."
 
-"There's one reviewer wallet I want to show you, because it's the
-clearest thing on this page."
+"I thought I had found coordinated reviews. Then I read the contracts
+that were posting them. The function names are createGame, games and
+getRound. Every transaction carries one positive score and one negative
+score. That is a winner and a loser. It is a game reporting its
+results."
 
-"It reviewed nineteen times, but it only sent nine transactions. Every
-one of those nine carried two reviews at once. A positive score for one
-agent and a negative score for another, in the same transaction. Eight
-of the nine put the positive on agent 153 and the negative on one of its
-five siblings."
+"So the tool was right that they are connected, and I was wrong about
+what it meant. That is exactly why the product says what a score is made
+of instead of passing judgement on it."
 
-"And that wallet was sent gas money by two of the six owner wallets,
-including the owner of agent 153, three seconds apart. Sixty one seconds
-later it posted again."
+**[1:40-2:20] Lookup page, run a live check.**
 
-"So the owner of the agent being scored paid the gas for a wallet that
-was scoring it up and scoring its rivals down, in the same transaction."
+Type an agent number and hit Check.
 
-**[1:10-1:50] Walk down the other signals.**
+"For any agent, this traces the funding behind every reviewer wallet
+back to its first transaction, checks whether the reviewers are people
+or contracts, checks whether the owner is reviewing itself, and checks
+whether the reviewers share a payer."
 
-"Once you know that, everything else lines up."
+"It returns context, not a verdict. Thin, self-reviewed, campaign
+shaped, game generated, or nothing to go on."
 
-Wallets created together: "The reviewer wallets were all created inside a
-48 minute window. One posted its first review 57 seconds after it existed
-on chain at all."
+**[2:20-2:50] Methodology page.**
 
-Automated review timing: "And they post on a clock. Roughly 50 to 80
-seconds apart, over and over. People don't review like that. Scripts do."
-
-Cross-agent overlap: "This is the signal most tools would lead with, and
-I want to be honest about it. Out of 7,690 reviewers, only 13 ever
-reviewed more than one agent. On its own it catches almost nothing, and
-anyone hiding would just use each wallet once. That's why the funding
-trail matters more."
-
-**[1:50-2:20] Methodology page.**
-
-"Everything is written down here, including what doesn't work."
-
-"The wallet reputation check is dead, so it says NOT ACTIVE instead of
+"Everything is written down here, including what does not work. The
+wallet reputation check is dead, so it reads NOT ACTIVE rather than
 showing a clean pass on a check that never ran."
 
-"And there's a wallet on Monad that has funded 7,665 other wallets. It's
-a faucet. If I didn't exclude it, every agent on the chain would look
-suspicious, and the tool would seem to be working while telling you
-nothing. So it's excluded, and that's written down too."
+"And one wallet on Monad has funded 7,665 others. If I did not exclude
+it, every agent on the chain would look connected, and the tool would
+appear to work while telling you nothing."
 
-**[2:20-2:50] Close.**
+**[2:50-3:00] Close.**
 
-"I'm deliberately not calling this fraud. I can't see intent, and this
-could be one developer testing their own agents. What I can show is that
-six agents presenting as independent were paid for by one wallet."
-
-"That's the point. A reputation score you can't trace is just a number.
-Headwater is the part that traces it."
-
----
+"A score you cannot trace is just a number. This is the part that traces
+it."
 
 ## Pitch video (max 2 minutes)
-
-Talking head is fine. Slides optional.
 
 **[0:00-0:20] Who and what.**
 
 "Hi, I'm [name]. I built Headwater."
 
-"ERC-8004 is the standard that gives AI agents a reputation on chain, so
-agents and people can work out who to trust. Monad has more real activity
-on it than any other chain I checked."
+"ERC-8004 is the standard that gives AI agents a reputation on chain.
+Monad is actively telling builders to use it, and its docs say agents
+should check reputation before a high-value transaction."
 
-**[0:20-0:50] The problem, with the number that makes it real.**
+**[0:20-0:50] What I found.**
 
-"Reputation is only as good as the reviewers. A study of ERC-8004 across
-Ethereum, BSC and Base found up to 73 percent of reviewers showed
-coordinated Sybil behaviour. Most reviews weren't independent people."
+"So I indexed every ERC-8004 agent on Monad. 10,254 registered. Eighty
+four have any review at all. One agent holds 83 percent of all the
+feedback on the whole chain, and all 7,665 of its reviewers were funded
+by a single wallet."
 
-"So a registry can tell you an agent has good reviews. It can't tell you
-whether those reviews mean anything."
+"Nobody had measured this. The trust layer Monad recommends is, right
+now, almost entirely empty, and the parts that are not empty are not
+what they look like."
 
-**[0:50-1:20] What I built, and what it found.**
+**[0:50-1:20] What the product does.**
 
-"Headwater traces where reviewer and owner wallets got their money, back
-to each wallet's first transaction."
+"Headwater tells you what a score is made of before you trust it. Is it
+broad, or is it one address reviewing over and over. Is the owner
+reviewing itself. Were the reviewers all paid by the same wallet. Are
+the reviewers even people, or are they contracts."
 
-"On Monad it found six agents that look independent, six different owner
-wallets. One of those wallets paid for the other five to exist. Five MON
-each, inside a minute, before any of the agents were registered. The
-reviewers were created the same day and posted on a timer."
+"It traces funding back to each wallet's first transaction, so it works
+on a chain with no labels and no history, which is exactly what Monad is
+today."
 
-**[1:20-1:45] Why it matters beyond this one case.**
+**[1:20-1:45] Why it matters.**
 
-"I'm not claiming those six are scammers. I can't prove intent and I
-don't try to. What I can prove is that they're not independent."
+"Agents are going to start paying each other, and the standard says to
+check reputation first. But a score with no context is not a safety
+check, it is a number."
 
-"That's the gap. Registries show you a score. Nobody shows you where it
-came from. If agents are going to start paying each other, somebody has
-to answer that."
+"I am not claiming anyone cheated. I checked the one cluster that looked
+like cheating and it turned out to be a game. That is the whole argument
+for why context has to sit next to the score."
 
 **[1:45-2:00] Close.**
 
-"It's live on Monad mainnet, the code is public, and the methodology page
-lists what works and what doesn't, including the checks that are switched
-off."
-
-"That's Headwater. Thanks for watching."
-
----
+"It is live on Monad mainnet, the code is public, and the methodology
+page lists what works and what does not, including the checks that are
+switched off. That's Headwater. Thanks for watching."
 
 ## Numbers to keep straight
 
-Every figure here was measured, not estimated. Don't round them up.
+Every figure was measured against the live indexer on 2026-09-22. Do not
+round them and do not add any that are not here.
 
-- 7,690 wallets have reviewed an agent
-- 9,188 feedback records
-- Only 13 reviewers ever reviewed more than one agent
-- Agents 153 to 158: six agents, six owner wallets
-- 5.000 MON to each of five owner wallets
-- Those owner wallets created inside 63 seconds
-- All six agents registered inside 119 seconds
-- Reviewer wallets created inside a 48 minute window
-- First review 57 seconds after that wallet's first transaction
-- Review gaps of 48 to 82 seconds
-- The paired reviewer: 19 reviews across 9 transactions, 2 reviews per
-  transaction, always one positive and one negative
-- 8 of those 9 put the positive on agent 153
-- It was funded by 2 of the 6 owner wallets, 3 seconds apart, and posted
-  again 61 seconds later
-- That gas arrived after it had already started reviewing, not before.
-  Do not say it was funded first
-- The faucet has funded 7,665 wallets
-- The 73 percent figure is arXiv 2606.26028, checked against the paper's
-  own abstract
+- 10,254 agents registered on Monad mainnet
+- 84 of them have any feedback at all
+- 9,188 feedback records in total
+- Agent 182 has 7,665 distinct reviewers, 83% of all feedback
+- All 300 sampled reviewers of agent 182 were funded by one wallet, and
+  that wallet funded exactly 7,665 addresses
+- 75 of the 84 have exactly one distinct reviewer
+- 76 of the 84 have one reviewer supplying 80% or more
+- 9 of the 84 were reviewed by their own owner
+- Agents 153 to 158: six agents, six owner wallets, 5.000 MON paid to
+  each of five of them, all six registered within 119 seconds
+- Of 50 reviewers sampled chain wide, 6 were contracts and 44 were
+  wallets
+- Monad runs about 85 transactions per second, roughly 7.35 million a day
 
 ## Do not say
 
-- "We caught fraudsters", or anything about scams
-- "Proves the reviews are fake". It proves common funding, which is not
-  the same thing and is stronger because it is provable
-- Any number that isn't in the list above
+- "Fraud", "scammers", "Sybil", "fake reviews", "we caught" anyone
+- "Money can't lie"
+- That the 153 to 158 cluster manipulated reviews. It was a game
+- The 73 percent figure from the arXiv study. That was measured on
+  Ethereum, BSC and Base, not Monad, and our own Monad data does not
+  support it
+- Any number that is not in the list above
