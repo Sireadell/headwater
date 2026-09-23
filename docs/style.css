@@ -125,6 +125,7 @@ a:hover { color: var(--accent-hover); }
 .badge-red { background: rgba(229,72,77,0.14); color: var(--red); }
 .badge-amber { background: rgba(245,166,35,0.14); color: var(--amber); }
 .badge-mut { background: rgba(139,145,150,0.14); color: var(--text-mut); }
+.badge-green { background: rgba(61,214,140,0.14); color: var(--green); }
 
 .footnote { font-size: 13px; color: var(--text-faint); margin-top: 14px; max-width: 700px; line-height: 1.5; }
 
