@@ -48,7 +48,7 @@
         </div>
         <div class="method-row">
           <div class="method-label">Shared funding origin</div>
-          <div class="method-desc">Records who paid into each wallet, then checks whether wallets that present as separate parties were capitalised by the same payer. Both native and token funding are followed, because an ERC-20 transfer&rsquo;s transaction recipient is the token contract rather than the wallet, so token funding is invisible to a native-only scan. Gas top-ups are excluded from the verdict: the earliest payment into a wallet is often a small fee subsidy rather than whoever actually funded it, and treating those as the same relationship produces a confident wrong answer. Both of those corrections are carried over from an earlier project where each was caught against live data. Known limit: native value moved by an internal contract call does not appear in top-level transactions, so some funding routes remain invisible.</div>
+          <div class="method-desc">Records who paid into each wallet, then checks whether wallets that present as separate parties were capitalised by the same payer. As deployed this follows native MON only. Every funder record on the live indexer has source &ldquo;native&rdquo;, checked 2026-09-23. Token funding is a real evasion route and is not covered: an ERC-20 transfer&rsquo;s transaction recipient is the token contract rather than the wallet, so it is invisible to a native scan. It was measured before being treated as a gap. Of 7,690 rater wallets on this chain, 7,684 already have a native funding record; five of the remaining six are contracts that never needed funding, and the last is a wallet holding 0.0007 MON. Token tracing would today explain one wallet. Gas top-ups are excluded from the verdict: the earliest payment into a wallet is often a small fee subsidy rather than whoever actually funded it, and treating those as the same relationship produces a confident wrong answer. Both of those corrections are carried over from an earlier project where each was caught against live data. Known limit: native value moved by an internal contract call does not appear in top-level transactions, so some funding routes remain invisible.</div>
         </div>
         <div class="method-row">
           <div class="method-label">Wallets created together</div>
@@ -103,6 +103,33 @@
         <div class="method-row">
           <div class="method-label">Registering Headwater as a listed agent</div>
           <div class="method-desc">Requires a funded wallet and a live on-chain transaction. Not registered yet.</div>
+        </div>
+      </div>
+
+      <div class="method-section-title" style="margin-top:34px;">
+        <div class="method-dot" style="background:var(--accent);"></div>
+        <span>The provenance verdict, and how to call it</span>
+      </div>
+      <div class="method-list">
+        <div class="method-row">
+          <div class="method-label">Two funding hops</div>
+          <div class="method-desc">Checking only whether an agent&rsquo;s owner paid its raters directly is defeated by one burner wallet in the middle, and one wallet is a few seconds of work. Funding is therefore traced across owner to rater, and owner to intermediary to rater. On agent 153 the second hop finds a rater the direct check does not see. A third hop is not attempted: on a chain where almost every wallet traces back to the same distributor, a long enough path connects everything to everything and the answer stops meaning anything.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">Owner identity beats distributor shape</div>
+          <div class="method-desc">A funder that has paid a great many wallets is normally a faucet, and flagging it would flag every agent on the chain, so those are excluded. That rule had one catastrophic exception: the funder behind agent 182&rsquo;s 7,665 raters funded exactly 7,665 wallets, and is that agent&rsquo;s own owner. Shape said faucet. Identity said the rated party paid for its own raters. Identity now wins, because a distributor that is also the agent&rsquo;s owner is the strongest case here rather than the weakest.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">Raters that are not people</div>
+          <div class="method-desc">A rater&rsquo;s deployed code is checked before its behaviour is described. Agents 153 to 158 read as a coordinated ring until the rating contracts are decoded and turn out to expose createGame, games and getRound, with every transaction carrying one positive and one negative score, which is a winner and a loser. An earlier version of this product called that manipulation, and it was wrong. When most raters are application contracts the verdict says APP GENERATED instead of leading with owner funding, and a test pins that ordering so the mistake cannot return quietly.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">What the verdicts mean</div>
+          <div class="method-desc">NO EVIDENCE, never rated, which is the normal case on this chain. THIN, every rating came from one address. SELF REVIEWED, the owner is among the raters. APP GENERATED, the raters are software recording outcomes rather than people forming opinions. OWNER FUNDED, the owner paid for its raters directly or through one hop, coloured by share so a third is not dressed up like everything. NO LINK FOUND, nothing found across two hops, stated as weaker evidence than a link would be and published alongside how much of the rater set could be traced at all.</div>
+        </div>
+        <div class="method-row">
+          <div class="method-label">Callable by an agent, not just readable by a person</div>
+          <div class="method-desc">Monad&rsquo;s own ERC-8004 documentation tells agents to check reputation before a high-value transaction, so this answers as JSON as well as as a page. A static API is published at <a href="api/index.json">api/index.json</a> and <a href="api/agents/182.json">api/agents/&lt;id&gt;.json</a>, with no key and no rate limit. An id with no file has never been rated, which index.json states as a verdict rather than leaving a 404 to be interpreted. An MCP server in the repository answers live and covers every registered agent. The page, the API and the MCP server all read the same rules out of one file, so they cannot answer the same question differently.</div>
         </div>
       </div>
     </div>
