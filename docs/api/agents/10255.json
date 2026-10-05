@@ -1,18 +1,19 @@
 {
-  "agentId": "7829",
-  "owner": "0x1c05a05d69f225ff195c18d6f9e1a70e42243cbe",
-  "agentURI": "https://eve-8004.vercel.app/metadata/b.json",
-  "registeredAt": 1771341205,
-  "verdict": "THIN",
-  "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "agentId": "10255",
+  "owner": "0x49472ef9ed99f30d4ead45ac9e1c16c31f70783a",
+  "agentURI": "data:application/json;base64,eyJ0eXBlIjoiaHR0cHM6Ly9laXBzLmV0aGVyZXVtLm9yZy9FSVBTL2VpcC04MDA0I3JlZ2lzdHJhdGlvbi12MSIsIm5hbWUiOiJUYWIgZGVtbyBBZ2VudCIsImRlc2NyaXB0aW9uIjoiQnV5cyBtZXRlcmVkIHRvb2wgY2FsbHMgb24gY3JlZGl0IHRocm91Z2ggVGFiIGFuZCBzZXR0bGVzIGl0cyBPcGVuIFRhYiBpbiBVU0RDIG9uIE1vbmFkLCBieSBpdHMgb3duIGtleSBvciBieSBhIFBlcm1pdDIgc2lnbmF0dXJlIGFueW9uZSBtYXkgc3VibWl0LiBJdHMgQ3JlZGl0IExpbWl0IGlzIGEgcHVyZSBmdW5jdGlvbiBvZiB0aGUgU2V0dGxlbWVudHMgYWxyZWFkeSBvbiBjaGFpbi4iLCJ4NDAyU3VwcG9ydCI6dHJ1ZSwiYWN0aXZlIjp0cnVlLCJzdXBwb3J0ZWRUcnVzdCI6WyJyZXB1dGF0aW9uIl19",
+  "registeredAt": 1790098099,
+  "verdict": "SELF REVIEWED",
+  "tone": "red",
+  "summary": "The wallet that owns this agent is among the wallets rating it.",
   "findings": [
+    "The owner's own wallet is among the raters.",
     "Every rating came from one single address."
   ],
   "evidence": {
-    "feedbackCount": 1,
+    "feedbackCount": 5,
     "distinctRaters": 1,
-    "selfRated": false,
+    "selfRated": true,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
@@ -35,5 +36,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:21:45.930Z"
+  "generatedAt": "2026-10-05T22:13:14.054Z"
 }

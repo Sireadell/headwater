@@ -1,12 +1,13 @@
 {
-  "agentId": "7829",
-  "owner": "0x1c05a05d69f225ff195c18d6f9e1a70e42243cbe",
-  "agentURI": "https://eve-8004.vercel.app/metadata/b.json",
-  "registeredAt": 1771341205,
+  "agentId": "10167",
+  "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
+  "agentURI": "https://execution.market/workers/0x945659f0eb9c34487b0c0f61ed7e9d279ace8f09",
+  "registeredAt": 1785008412,
   "verdict": "THIN",
   "tone": "amber",
   "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
   "findings": [
+    "1 of the 1 raters checked are contracts rather than wallets.",
     "Every rating came from one single address."
   ],
   "evidence": {
@@ -16,9 +17,9 @@
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
-    "ratersWithKnownFunder": 1,
+    "ratersWithKnownFunder": 0,
     "ratersTraced": 1,
-    "contractRaters": 0,
+    "contractRaters": 1,
     "applicationRaters": 0,
     "ratersCheckedForCode": 1,
     "paidOwnerBeforeRating": 0,
@@ -35,5 +36,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:21:45.930Z"
+  "generatedAt": "2026-10-05T22:15:05.497Z"
 }

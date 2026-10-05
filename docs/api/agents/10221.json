@@ -8,20 +8,20 @@
   "summary": "The wallet that owns this agent is among the wallets rating it.",
   "findings": [
     "The owner's own wallet is among the raters.",
-    "Every rating came from one single address."
+    "2 of the 3 raters checked are contracts rather than wallets."
   ],
   "evidence": {
-    "feedbackCount": 1,
-    "distinctRaters": 1,
+    "feedbackCount": 3,
+    "distinctRaters": 3,
     "selfRated": true,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
-    "ratersWithKnownFunder": 1,
-    "ratersTraced": 1,
-    "contractRaters": 0,
+    "ratersWithKnownFunder": 2,
+    "ratersTraced": 3,
+    "contractRaters": 2,
     "applicationRaters": 0,
-    "ratersCheckedForCode": 1,
+    "ratersCheckedForCode": 3,
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
@@ -31,10 +31,10 @@
     "fundingHops": 2,
     "fundingAsset": "native MON only",
     "paymentTiming": "A payment is timed against the payer's FIRST payment to this owner, since that is what the index stores. A later payment by an already-paying wallet is not separately timed.",
-    "codeCheckSample": 1,
-    "codeCheckTotal": 1,
+    "codeCheckSample": 3,
+    "codeCheckTotal": 3,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
-  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
-  "generatedAt": "2026-09-23T15:05:34.798Z"
+  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
+  "generatedAt": "2026-10-05T22:13:44.178Z"
 }

@@ -1,26 +1,26 @@
 {
-  "agentId": "7829",
-  "owner": "0x1c05a05d69f225ff195c18d6f9e1a70e42243cbe",
-  "agentURI": "https://eve-8004.vercel.app/metadata/b.json",
-  "registeredAt": 1771341205,
-  "verdict": "THIN",
-  "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 84 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "agentId": "10189",
+  "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
+  "agentURI": "https://execution.market/workers/0xc059b9cd5b7421a28f9259adb4511418fd548b5e",
+  "registeredAt": 1785871470,
+  "verdict": "NO LINK FOUND",
+  "tone": "mut",
+  "summary": "No funding link was found between this agent's owner and its raters, across both direct payments and one intermediary wallet. 1 of 2 raters have a funding record at all, so absence of a link is weaker evidence than a link would be.",
   "findings": [
-    "Every rating came from one single address."
+    "2 of the 2 raters checked are contracts rather than wallets."
   ],
   "evidence": {
-    "feedbackCount": 1,
-    "distinctRaters": 1,
+    "feedbackCount": 2,
+    "distinctRaters": 2,
     "selfRated": false,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
     "ratersWithKnownFunder": 1,
-    "ratersTraced": 1,
-    "contractRaters": 0,
+    "ratersTraced": 2,
+    "contractRaters": 2,
     "applicationRaters": 0,
-    "ratersCheckedForCode": 1,
+    "ratersCheckedForCode": 2,
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
@@ -30,10 +30,10 @@
     "fundingHops": 2,
     "fundingAsset": "native MON only",
     "paymentTiming": "A payment is timed against the payer's FIRST payment to this owner, since that is what the index stores. A later payment by an already-paying wallet is not separately timed.",
-    "codeCheckSample": 1,
-    "codeCheckTotal": 1,
+    "codeCheckSample": 2,
+    "codeCheckTotal": 2,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:21:45.930Z"
+  "generatedAt": "2026-10-05T22:14:28.313Z"
 }

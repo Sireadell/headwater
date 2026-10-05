@@ -20,14 +20,15 @@
     "note": "Funding moved by an internal contract call does not appear in top-level transactions, so absence of a link is weaker evidence than a link."
   },
   "counts": {
-    "agentsRegistered": 10256,
-    "agentsEverRated": 84,
+    "agentsRegistered": 10280,
+    "agentsEverRated": 93,
     "byVerdict": {
       "ROUND TRIP": 3,
-      "THIN": 51,
+      "THIN": 56,
+      "SELF REVIEWED": 10,
       "OWNER FUNDED": 15,
       "APP GENERATED": 6,
-      "SELF REVIEWED": 9
+      "NO LINK FOUND": 3
     }
   },
   "agents": [
@@ -53,6 +54,13 @@
       "ownerFunded": 0
     },
     {
+      "agentId": "10182",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 16,
+      "feedbackCount": 78,
+      "ownerFunded": 0
+    },
+    {
       "agentId": "8317",
       "verdict": "ROUND TRIP",
       "distinctRaters": 1,
@@ -74,17 +82,17 @@
       "ownerFunded": 2
     },
     {
-      "agentId": "10182",
+      "agentId": "10181",
       "verdict": "SELF REVIEWED",
-      "distinctRaters": 1,
-      "feedbackCount": 42,
+      "distinctRaters": 11,
+      "feedbackCount": 37,
       "ownerFunded": 0
     },
     {
-      "agentId": "10181",
+      "agentId": "10180",
       "verdict": "SELF REVIEWED",
-      "distinctRaters": 1,
-      "feedbackCount": 19,
+      "distinctRaters": 7,
+      "feedbackCount": 13,
       "ownerFunded": 0
     },
     {
@@ -92,6 +100,13 @@
       "verdict": "APP GENERATED",
       "distinctRaters": 4,
       "feedbackCount": 13,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10261",
+      "verdict": "NO LINK FOUND",
+      "distinctRaters": 3,
+      "feedbackCount": 12,
       "ownerFunded": 0
     },
     {
@@ -158,13 +173,6 @@
       "ownerFunded": 0
     },
     {
-      "agentId": "10180",
-      "verdict": "SELF REVIEWED",
-      "distinctRaters": 1,
-      "feedbackCount": 7,
-      "ownerFunded": 0
-    },
-    {
       "agentId": "8353",
       "verdict": "OWNER FUNDED",
       "distinctRaters": 1,
@@ -176,6 +184,34 @@
       "verdict": "THIN",
       "distinctRaters": 1,
       "feedbackCount": 6,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10169",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 4,
+      "feedbackCount": 5,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10184",
+      "verdict": "NO LINK FOUND",
+      "distinctRaters": 3,
+      "feedbackCount": 5,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10220",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10255",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 1,
+      "feedbackCount": 5,
       "ownerFunded": 0
     },
     {
@@ -228,6 +264,20 @@
       "ownerFunded": 1
     },
     {
+      "agentId": "10168",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 4,
+      "feedbackCount": 4,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10221",
+      "verdict": "SELF REVIEWED",
+      "distinctRaters": 3,
+      "feedbackCount": 3,
+      "ownerFunded": 0
+    },
+    {
       "agentId": "6238",
       "verdict": "THIN",
       "distinctRaters": 1,
@@ -240,6 +290,13 @@
       "distinctRaters": 1,
       "feedbackCount": 3,
       "ownerFunded": 1
+    },
+    {
+      "agentId": "10189",
+      "verdict": "NO LINK FOUND",
+      "distinctRaters": 2,
+      "feedbackCount": 2,
+      "ownerFunded": 0
     },
     {
       "agentId": "10248",
@@ -326,15 +383,8 @@
       "ownerFunded": 0
     },
     {
-      "agentId": "10168",
-      "verdict": "SELF REVIEWED",
-      "distinctRaters": 1,
-      "feedbackCount": 1,
-      "ownerFunded": 0
-    },
-    {
-      "agentId": "10169",
-      "verdict": "SELF REVIEWED",
+      "agentId": "10167",
+      "verdict": "THIN",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -347,6 +397,20 @@
       "ownerFunded": 0
     },
     {
+      "agentId": "10188",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
+      "agentId": "10190",
+      "verdict": "THIN",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 0
+    },
+    {
       "agentId": "10219",
       "verdict": "SELF REVIEWED",
       "distinctRaters": 1,
@@ -354,14 +418,14 @@
       "ownerFunded": 0
     },
     {
-      "agentId": "10221",
-      "verdict": "SELF REVIEWED",
+      "agentId": "10223",
+      "verdict": "THIN",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
-      "agentId": "10223",
+      "agentId": "10262",
       "verdict": "THIN",
       "distinctRaters": 1,
       "feedbackCount": 1,
@@ -620,6 +684,6 @@
       "ownerFunded": 0
     }
   ],
-  "source": "https://indexer.dev.hyperindex.xyz/596a934/v1/graphql",
-  "generatedAt": "2026-09-23T15:07:33.217Z"
+  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
+  "generatedAt": "2026-10-05T22:21:53.886Z"
 }
