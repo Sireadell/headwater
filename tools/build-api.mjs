@@ -7,8 +7,8 @@
 // the last build. The MCP server in mcp/ answers live for anything that needs
 // current state, and both read the same rules out of docs/provenance.js.
 //
-// Only rated agents get a file. There are 10,254 registered agents and 84 have
-// ever been rated, so publishing the other 10,170 would mean ten thousand
+// Only rated agents get a file. There are more than 10,000 registered agents and
+// 93 have ever been rated, so publishing the rest would mean ten thousand
 // identical "no evidence" documents. index.json says plainly that an id with
 // no file has never been rated, which is a real answer rather than a 404 left
 // to interpretation.
@@ -41,7 +41,7 @@ async function ratedAgentIds() {
 
 async function totalAgents() {
   // No aggregate is exposed on this endpoint, so the count is walked. It is
-  // published in index.json because "84 of how many" is the whole point.
+  // published in index.json because "93 of how many" is the whole point.
   let total = 0;
   for (let offset = 0; ; offset += PAGE) {
     const data = await graphql(

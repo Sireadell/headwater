@@ -20,13 +20,13 @@
     "note": "Funding moved by an internal contract call does not appear in top-level transactions, so absence of a link is weaker evidence than a link."
   },
   "counts": {
-    "agentsRegistered": 10280,
-    "agentsEverRated": 93,
+    "agentsRegistered": 10281,
+    "agentsEverRated": 94,
     "byVerdict": {
       "ROUND TRIP": 3,
       "THIN": 56,
       "SELF REVIEWED": 10,
-      "OWNER FUNDED": 15,
+      "OWNER FUNDED": 16,
       "APP GENERATED": 6,
       "NO LINK FOUND": 3
     }
@@ -432,6 +432,13 @@
       "ownerFunded": 0
     },
     {
+      "agentId": "10280",
+      "verdict": "OWNER FUNDED",
+      "distinctRaters": 1,
+      "feedbackCount": 1,
+      "ownerFunded": 1
+    },
+    {
       "agentId": "118",
       "verdict": "THIN",
       "distinctRaters": 1,
@@ -685,5 +692,5 @@
     }
   ],
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:21:53.886Z"
+  "generatedAt": "2026-10-05T22:54:31.050Z"
 }

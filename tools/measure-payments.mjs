@@ -7,16 +7,17 @@
 // Why this exists: "raters who paid the agent are more trustworthy" is the
 // filter everyone reaches for, including us, and it is worth almost nothing on
 // this chain. Saying so is only credible if the reader can rebuild the number
-// without trusting us. Published 2026-09-23:
+// without trusting us. Re-measured 2026-10-05 (first published 2026-09-23
+// as 7,771 across 84 agents, with the same 3 and 2):
 //
-//   7,771  (agent, rater) relationships across all 84 rated agents
+//   7,824  (agent, rater) relationships across all 93 rated agents
 //   7,670  where the rater sent native MON to that agent's owner
 //       3  where the payment arrived BEFORE the rating
 //       2  distinct wallets behind those 3
 //
 // ProofLines (github.com/ColinkaMir/monad-agent-trust) built the same filter
 // independently, from their own RPC scan rather than from this index, and
-// publish the same 3 pairs from the same 2 wallets. Two pipelines, one answer.
+// publish the same 3 pairs from the same 2 wallets, counted as 16 ratings. Two pipelines, one answer.
 //
 // The chain keeps moving, so a later run may differ. A run that differs in the
 // first two numbers by a few is the registry growing. A run where the third
@@ -33,7 +34,7 @@ const ids = index.agents.map((a) => a.agentId);
 
 const PAGE = 1000;
 
-// The endpoint throttles a back-to-back walk of 84 agents and answers 429. A
+// The endpoint throttles a back-to-back walk of every rated agent and answers 429. A
 // short pause between agents is cheaper than a retry storm and keeps a full
 // run reproducible on a first attempt.
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

@@ -1,20 +1,20 @@
 {
-  "agentId": "146",
-  "owner": "0x12e9e3eee25cbf776248b344c15565774f273bd2",
-  "agentURI": null,
-  "registeredAt": 1771066697,
-  "verdict": "THIN",
-  "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 93 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "agentId": "10280",
+  "owner": "0x4f3f999b60750cef97d7d56c75f30f050a583d53",
+  "agentURI": "https://agenttrace-mainnet.vercel.app/api/erc8004/agents/1",
+  "registeredAt": 1791239421,
+  "verdict": "OWNER FUNDED",
+  "tone": "red",
+  "summary": "Money for 100% of the traced raters came from the agent's own owner. That is not an accusation of fraud, and a paid campaign can be perfectly legitimate. It does mean that much of the score is not independent evidence, because the party being rated paid for those raters to exist.",
   "findings": [
-    "1 rater paid this agent's owner BEFORE rating it and was not funded by that owner. That is the strongest grounding available here, and it is rare: 3 such relationships exist across the whole chain.",
+    "1 of 1 raters were paid directly by this agent's own owner.",
     "Every rating came from one single address."
   ],
   "evidence": {
-    "feedbackCount": 9,
+    "feedbackCount": 1,
     "distinctRaters": 1,
     "selfRated": false,
-    "ownerFundedDirect": 0,
+    "ownerFundedDirect": 1,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
     "ratersWithKnownFunder": 1,
@@ -22,10 +22,10 @@
     "contractRaters": 0,
     "applicationRaters": 0,
     "ratersCheckedForCode": 1,
-    "paidOwnerBeforeRating": 1,
+    "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
-    "independentPaidBeforeRating": 1
+    "independentPaidBeforeRating": 0
   },
   "limits": {
     "fundingHops": 2,
@@ -36,5 +36,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:50:36.977Z"
+  "generatedAt": "2026-10-05T22:52:28.413Z"
 }

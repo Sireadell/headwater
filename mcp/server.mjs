@@ -4,8 +4,8 @@
 // Monad's own ERC-8004 documentation tells agents to check reputation before a
 // high-value transaction. The registry answers "what is the score". It cannot
 // answer "is that score worth anything", and on Monad that second question is
-// the one that matters: of 10,254 registered agents only 84 have ever been
-// rated, and the single most-rated agent had every one of its 7,665 raters
+// the one that matters: of more than 10,000 registered agents only 93 have ever
+// been rated, and the single most-rated agent had every one of its 7,665 raters
 // funded by its own owner.
 //
 // This speaks MCP over stdio with no dependencies. The protocol here is a few

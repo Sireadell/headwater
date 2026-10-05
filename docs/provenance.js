@@ -2,7 +2,7 @@
 //
 // The question this answers is not "does this agent have good reviews". The
 // registry already shows that, and on Monad the number is close to
-// meaningless: of 10,254 registered agents only 84 have ever been rated, and
+// meaningless: of more than 10,000 registered agents only 93 have ever been rated, and
 // a single agent holds 83% of all feedback on the chain.
 //
 // The question is where the raters' money came from, because that is the one
@@ -135,10 +135,10 @@ async function fundersOf(wallets) {
 // This is the filter a reasonable person reaches for first: a rating from
 // somebody who actually paid for the service ought to be worth more than a
 // rating from a stranger. It is measured here before it is trusted, and the
-// measurement says it certifies almost nothing on this chain. Across all 84
-// rated agents there are 7,771 (agent, rater) relationships. In 7,670 of them
+// measurement says it certifies almost nothing on this chain. Across all 93
+// rated agents there are 7,824 (agent, rater) relationships. In 7,670 of them
 // the rater did send native MON to the agent's owner. In exactly 3 of them the
-// payment came BEFORE the rating. Measured 2026-09-23 against the live
+// payment came BEFORE the rating. Measured 2026-10-05 (first run 2026-09-23) against the live
 // endpoint; ProofLines published the same 3 from an independent pipeline, so
 // two different methods agree on the number.
 //
@@ -280,7 +280,7 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       tone: "mut",
       summary:
         "This agent has never been rated. That is the normal case on Monad: " +
-        "10,170 of 10,254 registered agents have no feedback at all. There is " +
+        "More than 99 percent of registered agents have no feedback at all. There is " +
         "nothing here to trust or distrust.",
       findings,
     };
@@ -427,7 +427,7 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       label: "THIN",
       tone: "amber",
       summary:
-        "Every rating on this agent came from a single address. 75 of the 84 rated agents on " +
+        "Every rating on this agent came from a single address. 75 of the 93 rated agents on " +
         "Monad are in this position. One address agreeing with itself repeatedly is one " +
         "opinion, however many times it is recorded.",
       findings,

@@ -85,7 +85,7 @@ thing, open it directly in a browser.
 Monad's ERC-8004 documentation tells agents to check reputation before a
 high-value transaction. The registry answers "what is the score". It does not
 answer "is that score worth anything", which on Monad is the question that
-matters: of 10,254 registered agents, 84 have ever been rated, and the single
+matters: of more than 10,000 registered agents, 93 have ever been rated, and the single
 most-rated agent had all 7,665 of its raters funded by its own owner.
 
 There are two ways to ask.

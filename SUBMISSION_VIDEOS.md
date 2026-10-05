@@ -31,8 +31,8 @@ chain, and Monad's own documentation tells agents to check that score
 before a high-value transaction."
 
 "So I indexed every agent on Monad to see what those scores are made of.
-There are 10,254 of them. Eighty four have received a single review
-between them. Everything else has no reputation at all."
+There are more than ten thousand of them. Ninety three have ever been reviewed.
+Everything else has no reputation at all."
 
 **[0:25-1:00] The breakdown table.**
 
@@ -124,8 +124,8 @@ should check reputation before a high-value transaction."
 
 **[0:20-0:50] What I found.**
 
-"So I indexed every ERC-8004 agent on Monad. 10,254 registered. Eighty
-four have any review at all. One agent holds 83 percent of all the
+"So I indexed every ERC-8004 agent on Monad. More than ten thousand registered.
+Ninety three have any review at all. One agent holds 83 percent of all the
 feedback on the whole chain, and all 7,665 of its reviewers were funded
 by a single wallet."
 
@@ -165,21 +165,21 @@ switched off. That's Headwater. Thanks for watching."
 Every figure was measured against the live indexer on 2026-09-22. Do not
 round them and do not add any that are not here.
 
-- 10,254 agents registered as measured on 2026-09-22. The chain keeps
-  moving and the live API reads 10,256 today, so say "more than ten
+- 10,280 agents registered as measured on 2026-10-05. The chain keeps
+  moving, so say "more than ten
   thousand" on camera rather than a figure that drifts
 - Agent 182 round trip: 11.000000 MON out, rating 14 seconds later,
   10.934585768 MON back 6 seconds after that, all 7,665 raters
-- 3 of 7,771 agent-rater pairs chain-wide show a payment before rating
+- 3 of 7,824 agent-rater pairs chain-wide show a payment before rating
   with no owner funding. Another team measured 3 independently
-- 84 of them have any feedback at all
-- 9,188 feedback records in total
+- 93 of them have any feedback at all (all figures below re-measured 2026-10-05)
+- 9,290 feedback records in total
 - Agent 182 has 7,665 distinct reviewers, 83% of all feedback
 - All 300 sampled reviewers of agent 182 were funded by one wallet, and
   that wallet funded exactly 7,665 addresses
-- 75 of the 84 have exactly one distinct reviewer
-- 76 of the 84 have one reviewer supplying 80% or more
-- 9 of the 84 were reviewed by their own owner
+- 75 of the 93 have exactly one distinct reviewer
+- 77 of the 93 have one reviewer supplying 80% or more
+- 10 of the 93 were reviewed by their own owner
 - Agents 153 to 158: six agents, six owner wallets, 5.000 MON paid to
   each of five of them, all six registered within 119 seconds
 - Of 50 reviewers sampled chain wide, 6 were contracts and 44 were
