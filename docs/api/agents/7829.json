@@ -24,6 +24,7 @@
     "ratersCheckedForCode": 1,
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
+    "paidOwnerBeforeAgentExisted": 0,
     "roundTripped": 0,
     "rings": [
       {
@@ -76,5 +77,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T11:38:14.736Z"
+  "generatedAt": "2026-10-06T12:09:20.575Z"
 }

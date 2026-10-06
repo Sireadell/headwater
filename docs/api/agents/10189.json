@@ -7,7 +7,6 @@
   "tone": "amber",
   "summary": "This agent's ratings trace to a group that also rated 11 other agents. Looked at alone, this agent's reviews seem ordinary. Looked at across the chain, the same money source sits behind all of them. That describes where the money and the ratings came from, not why, and a group of related agents can be perfectly legitimate. It does mean these reviews are not independent of each other.",
   "findings": [
-    "2 of the 2 raters checked are contracts rather than wallets.",
     "Wallet 0xd3868e1e... funded 13 raters that rated 12 agents, this one and 11 others. It is not this agent's owner, so a check that only follows the owner's money would miss it."
   ],
   "evidence": {
@@ -19,11 +18,12 @@
     "intermediaries": [],
     "ratersWithKnownFunder": 1,
     "ratersTraced": 2,
-    "contractRaters": 2,
+    "contractRaters": 0,
     "applicationRaters": 0,
     "ratersCheckedForCode": 2,
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
+    "paidOwnerBeforeAgentExisted": 0,
     "roundTripped": 0,
     "rings": [
       {
@@ -57,5 +57,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T11:35:31.101Z"
+  "generatedAt": "2026-10-06T12:07:21.176Z"
 }

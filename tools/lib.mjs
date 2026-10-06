@@ -172,7 +172,7 @@ export async function checkAgent(agentId, { rings } = {}) {
   const owner = agent.owner.toLowerCase();
   const { raters, feedbackCount, firstRatedAt } = await ratersOf(String(agentId));
   const funding = await traceOwnerFunding(owner, raters);
-  const payments = await tracePayments(owner, raters, firstRatedAt);
+  const payments = await tracePayments(owner, raters, firstRatedAt, agent.registeredAtTimestamp);
   const raterTypes = await classifyRaters(raters);
   const selfRated = raters.includes(owner) ? 1 : 0;
   if (!rings) rings = ringsCache ??= await loadRings();
@@ -216,6 +216,7 @@ export async function checkAgent(agentId, { rings } = {}) {
       ratersCheckedForCode: raterTypes.sampled,
       paidOwnerBeforeRating: payments.paidBefore.length,
       paidOwnerAfterRating: payments.paidAfter.length,
+      paidOwnerBeforeAgentExisted: payments.paidBeforeAgentExisted.length,
       // Funded by the owner, then sent funds back to the owner. Reported
       // separately from a bare payment count because the two support opposite
       // readings of the same score.

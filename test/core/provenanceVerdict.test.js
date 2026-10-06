@@ -236,8 +236,9 @@ test('a payment made after the rating is not reported as a round trip on its own
 });
 
 test('a rater that paid before rating, and was never owner funded, is called out', () => {
-  // The rarest thing on this chain: 3 such relationships exist in total,
-  // measured 2026-09-23 and matched independently by ProofLines.
+  // The rarest thing on this chain: 1 such relationship exists in total. Three
+  // were reported until 2026-10-06, but two of them paid the owner wallet
+  // before the agent was registered (see the next test).
   const v = buildVerdict({
     ...base,
     funding: funding({ traced: 3, known: 3 }),
@@ -255,4 +256,12 @@ test('a caller that supplies no payment record gets no payment claim', () => {
   const v = buildVerdict({ ...base, funding: funding({ direct: 3, traced: 3 }) });
   assert.equal(v.label, 'OWNER FUNDED');
   assert.ok(!v.findings.some((f) => /round trip|paid this agent/i.test(f)));
+});
+
+test("money sent to the owner's wallet before the agent existed is not a customer payment", () => {
+  const p = payments({ traced: 3 });
+  p.paidBeforeAgentExisted = [{ rater: addr(100), isDust: false, valueRaw: '100000000000000000', paidAt: 1 }];
+  const v = buildVerdict({ ...base, funding: funding({ traced: 3, known: 3 }), payments: p });
+  assert.ok(!v.findings.some((f) => /BEFORE rating it/.test(f)));
+  assert.ok(v.findings.some((f) => /before this agent was registered/.test(f)));
 });

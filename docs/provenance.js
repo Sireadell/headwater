@@ -74,7 +74,14 @@ async function classifyRaters(addresses) {
   const results = await Promise.allSettled(
     sample.map(async (addr) => {
       const code = await rpcCall("eth_getCode", [addr, "latest"]);
-      const isContract = typeof code === "string" && code.length > 2;
+      // An ordinary wallet that has switched on a smart-wallet add-on
+      // (EIP-7702) also returns code: 0xef0100 followed by the address of the
+      // add-on. It is still a person's wallet with its own key, so counting it
+      // as a contract would tell a reader that people are software. The raters
+      // of agents 10167 to 10262 and of agent 4 were described that way until
+      // 2026-10-06.
+      const isSmartWallet = typeof code === "string" && code.toLowerCase().startsWith("0xef0100");
+      const isContract = typeof code === "string" && code.length > 2 && !isSmartWallet;
       let app = null;
       if (isContract) {
         const hits = Object.entries(APP_SELECTORS)
@@ -82,7 +89,7 @@ async function classifyRaters(addresses) {
           .map(([, sig]) => sig);
         if (hits.length > 0) app = hits;
       }
-      return [addr, { isContract, app }];
+      return [addr, { isContract, isSmartWallet, app }];
     }),
   );
   for (const r of results) if (r.status === "fulfilled") out.set(r.value[0], r.value[1]);
@@ -138,9 +145,12 @@ async function fundersOf(wallets) {
 // measurement says it certifies almost nothing on this chain. Across all 93
 // rated agents there are 7,824 (agent, rater) relationships. In 7,670 of them
 // the rater did send native MON to the agent's owner. In exactly 3 of them the
-// payment came BEFORE the rating. Measured 2026-10-05 (first run 2026-09-23) against the live
-// endpoint; ProofLines published the same 3 from an independent pipeline, so
-// two different methods agree on the number.
+// payment came BEFORE the rating, and ProofLines published the same 3 from an
+// independent pipeline. Looked at closely on 2026-10-06, only 1 of the 3 is a
+// payment for a service. On agents 145 and 146 the rater sent each owner
+// wallet 0.1 MON two minutes before the agent was registered: that is paying
+// for the wallet to exist, not paying an agent that did not exist yet. So a
+// payment only counts as a customer's once the agent is registered.
 //
 // What the other 7,667 are is the interesting part, and it is why a
 // payment-backed filter used on its own would read this chain exactly
@@ -157,11 +167,11 @@ async function fundersOf(wallets) {
 // each wallet, so "paid before rating" means the payer's FIRST payment to the
 // owner predates its first rating. A later payment by an already-paying wallet
 // is not separately timed here.
-async function tracePayments(owner, raterIds, firstRatedAt) {
+async function tracePayments(owner, raterIds, firstRatedAt, registeredAt) {
   const ownerLc = (owner || "").toLowerCase();
   const raters = raterIds.map((r) => r.toLowerCase());
   if (!ownerLc || raters.length === 0) {
-    return { paidBefore: [], paidAfter: [], paidUnknownTime: [], tracedRaters: raters.length };
+    return { paidBefore: [], paidAfter: [], paidUnknownTime: [], paidBeforeAgentExisted: [], tracedRaters: raters.length };
   }
 
   // Same two caps as fundersOf: at most 1,000 rows come back however large a
@@ -172,6 +182,8 @@ async function tracePayments(owner, raterIds, firstRatedAt) {
   const paidBefore = [];
   const paidAfter = [];
   const paidUnknownTime = [];
+  const paidBeforeAgentExisted = [];
+  const born = registeredAt === undefined || registeredAt === null ? null : Number(registeredAt);
 
   for (let i = 0; i < raters.length; i += BATCH) {
     const batch = raters.slice(i, i + BATCH);
@@ -201,6 +213,8 @@ async function tracePayments(owner, raterIds, firstRatedAt) {
         const ratedAt = firstRatedAt ? firstRatedAt.get(rater) : undefined;
         if (ratedAt === undefined || row.firstFundedTimestamp === undefined || row.firstFundedTimestamp === null) {
           paidUnknownTime.push(record);
+        } else if (born !== null && Number(row.firstFundedTimestamp) < born) {
+          paidBeforeAgentExisted.push(record);
         } else if (row.firstFundedTimestamp <= ratedAt) {
           paidBefore.push(record);
         } else {
@@ -211,7 +225,7 @@ async function tracePayments(owner, raterIds, firstRatedAt) {
     }
   }
 
-  return { paidBefore, paidAfter, paidUnknownTime, tracedRaters: raters.length };
+  return { paidBefore, paidAfter, paidUnknownTime, paidBeforeAgentExisted, tracedRaters: raters.length };
 }
 
 
@@ -326,7 +340,14 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       `${independentPaidBefore.length} rater${independentPaidBefore.length === 1 ? "" : "s"} ` +
         `paid this agent's owner BEFORE rating it and ${independentPaidBefore.length === 1 ? "was" : "were"} ` +
         "not funded by that owner. That is the strongest grounding available here, and it is rare: " +
-        "3 such relationships exist across the whole chain.",
+        "1 such relationship exists across the whole chain.",
+    );
+  }
+  const setUp = (pay.paidBeforeAgentExisted || []).length;
+  if (setUp > 0) {
+    findings.push(
+      `${setUp} rater${setUp === 1 ? "" : "s"} sent money to the owner's wallet before this agent was ` +
+        "registered, then rated it. That pays for the wallet to exist. It is not a customer paying for a service.",
     );
   }
   if (pay.paidAfter.length > 0 && roundTrip.length === 0) {

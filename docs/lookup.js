@@ -639,7 +639,7 @@ async function checkAgent() {
       try {
         const raterAddrs = reviewerIds.map((id) => id.toLowerCase());
         const funding = await traceOwnerFunding(agent.owner, raterAddrs);
-        const payments = await tracePayments(agent.owner, raterAddrs, ratings.firstRatedAt);
+        const payments = await tracePayments(agent.owner, raterAddrs, ratings.firstRatedAt, agent.registeredAtTimestamp);
         const raterTypes = await classifyRaters(raterAddrs);
         const selfRated = raterAddrs.includes(agent.owner.toLowerCase()) ? 1 : 0;
         // Rings need the whole chain at once, so the page reads the copy the

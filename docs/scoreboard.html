@@ -86,10 +86,10 @@
       </div>
       <div class="claim-row">
         <div class="claim-title">
-          <div class="claim-name">Only 3 of 7,824 rater relationships on this chain involve a payment made before the rating</div>
-          <div class="claim-sub">From 2 distinct wallets, re-measured 2026-10-05 with the same result. Rebuild it yourself with tools/measure-payments.mjs, which reads the same public endpoint. Confirmed externally: ProofLines arrive at the same 3 pairs from the same 2 wallets out of an independent pipeline that never touches our index.</div>
+          <div class="claim-name">Only 1 of 7,824 rater relationships on this chain is a payment to a working agent made before the rating</div>
+          <div class="claim-sub">We and ProofLines, from independent pipelines, both count 3 payments made before the rating, from 2 wallets. Corrected 2026-10-06: two of them, on agents 145 and 146, arrived two minutes before those agents were registered, so they paid for the wallets to exist, not for a service. The one left is agent 4. Rebuild it yourself with tools/measure-payments.mjs, which reads the same public endpoint and prints both counts.</div>
         </div>
-        <div class="claim-date mono">2026-09-23</div>
+        <div class="claim-date mono">2026-10-06</div>
         <div class="claim-status"><span class="badge badge-green mono">CONFIRMED</span></div>
         <div class="claim-evidence"><a href="api/agents/4.json">api/agents/4.json &rarr;</a></div>
       </div>

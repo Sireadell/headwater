@@ -8,16 +8,18 @@
 // filter everyone reaches for, including us, and it is worth almost nothing on
 // this chain. Saying so is only credible if the reader can rebuild the number
 // without trusting us. Re-measured 2026-10-05 (first published 2026-09-23
-// as 7,771 across 84 agents, with the same 3 and 2):
+// as 7,771 across 84 agents):
 //
 //   7,824  (agent, rater) relationships across all 93 rated agents
 //   7,670  where the rater sent native MON to that agent's owner
-//       3  where the payment arrived BEFORE the rating
-//       2  distinct wallets behind those 3
+//       3  where the payment arrived BEFORE the rating, from 2 wallets
+//       1  of those once the agent already existed (corrected 2026-10-06)
 //
 // ProofLines (github.com/ColinkaMir/monad-agent-trust) built the same filter
-// independently, from their own RPC scan rather than from this index, and
-// publish the same 3 pairs from the same 2 wallets, counted as 16 ratings. Two pipelines, one answer.
+// independently and publish the same 3 pairs from the same 2 wallets. Two of
+// the 3 (agents 145 and 146) are 0.1 MON sent to the owner wallet two minutes
+// before the agent was registered, which pays for the wallet rather than for
+// a service, so this script now counts them separately.
 //
 // The chain keeps moving, so a later run may differ. A run that differs in the
 // first two numbers by a few is the registry growing. A run where the third
@@ -61,13 +63,15 @@ async function fundersOfOwner(owner) {
 let pairs = 0;
 let paid = 0;
 const independentPairs = [];
+const beforeAgentExisted = [];
 
 for (const id of ids) {
   const agentData = await graphql(
-    `query A($id: String!) { Agent(where: { id: { _eq: $id } }) { id owner } }`,
+    `query A($id: String!) { Agent(where: { id: { _eq: $id } }) { id owner registeredAtTimestamp } }`,
     { id },
   );
   const owner = agentData.Agent?.[0]?.owner?.toLowerCase();
+  const born = Number(agentData.Agent?.[0]?.registeredAtTimestamp ?? 0);
   if (!owner) continue;
 
   const { raters, firstRatedAt } = await ratersOf(id);
@@ -98,7 +102,9 @@ for (const id of ids) {
     paid++;
     const ratedAt = firstRatedAt.get(rater);
     if (ratedAt !== undefined && p <= ratedAt && !ownerFunded.has(rater)) {
-      independentPairs.push({ agentId: id, rater, paidAt: p, ratedAt });
+      const pair = { agentId: id, rater, paidAt: p, ratedAt };
+      if (Number(p) < born) beforeAgentExisted.push(pair);
+      else independentPairs.push(pair);
     }
   }
   process.stdout.write(".");
@@ -111,9 +117,14 @@ console.log(`agents rated                         ${ids.length}`);
 console.log(`(agent, rater) relationships         ${pairs}`);
 console.log(`rater sent native MON to the owner   ${paid}`);
 console.log(`payment arrived BEFORE the rating,`);
-console.log(`and the owner never funded the rater ${independentPairs.length}`);
+console.log(`and the owner never funded the rater ${independentPairs.length + beforeAgentExisted.length}`);
+console.log(`  of which before the agent existed   ${beforeAgentExisted.length}`);
+console.log(`  of which a payment to a live agent  ${independentPairs.length}`);
 console.log(`distinct wallets behind those        ${wallets.size}`);
 console.log("");
 for (const p of independentPairs) {
   console.log(`  agent ${p.agentId}  rater ${p.rater}  paid ${p.paidAt}  rated ${p.ratedAt}`);
+}
+for (const p of beforeAgentExisted) {
+  console.log(`  agent ${p.agentId}  rater ${p.rater}  paid ${p.paidAt}  rated ${p.ratedAt}  (before the agent existed)`);
 }

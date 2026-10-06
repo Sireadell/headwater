@@ -64,6 +64,11 @@ exactly at three. Two separate pipelines reading the same chain and
 getting the same number is worth more to you than either of us claiming
 it alone."
 
+"Then I looked closer. Two of those three paid the owner two minutes
+before the agent even existed. That pays for a wallet, not a service. So
+on this whole chain, one reviewer paid a working agent before rating it.
+One."
+
 **[1:20-1:50] Agents 153 to 158, the honest part.**
 
 "These six looked like the most suspicious thing on the chain. Six
@@ -170,7 +175,10 @@ round them and do not add any that are not here.
   thousand" on camera rather than a figure that drifts
 - Agent 182 round trip: 11.000000 MON out, rating 14 seconds later,
   10.934585768 MON back 6 seconds after that, all 7,665 raters
-- 3 of 7,824 agent-rater pairs chain-wide show a payment before rating
+- 3 of 7,824 agent-rater pairs chain-wide show a payment before rating, and
+  only 1 of those (agent 4) went to an agent that already existed. On 145 and
+  146 the money arrived two minutes before the agent was registered
+  (checked 2026-10-06)
   with no owner funding. Another team measured 3 independently
 - 93 of them have any feedback at all (all figures below re-measured 2026-10-05)
 - 9,290 feedback records in total
