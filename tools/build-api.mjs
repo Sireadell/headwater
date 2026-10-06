@@ -15,7 +15,7 @@
 import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { graphql, checkAgent, ENDPOINT } from "./lib.mjs";
+import { graphql, checkAgent, loadRings, ENDPOINT } from "./lib.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "docs/api");
@@ -63,9 +63,16 @@ const main = async () => {
   const registered = await totalAgents();
   console.log(`${registered} agents registered, ${ids.length} ever rated`);
 
+  // Computed once from the whole chain and handed to every agent, and also
+  // published on its own so the page can read it without loading the chain.
+  const rings = await loadRings();
+  writeFileSync(join(outDir, "rings.json"), `${JSON.stringify({ rings, generatedAt: new Date().toISOString() }, null, 2)}
+`);
+  console.log(`${rings.length} rings`);
+
   const summary = [];
   for (const id of ids) {
-    const report = await checkAgent(id);
+    const report = await checkAgent(id, { rings });
     if (!report) continue;
     writeFileSync(join(agentsDir, `${id}.json`), `${JSON.stringify(report, null, 2)}\n`);
     summary.push({
@@ -105,6 +112,7 @@ const main = async () => {
       "ROUND TRIP":
         "The owner paid its raters and the same wallets sent funds back to the owner after rating. " +
         "The money left the owner and returned to the owner.",
+      RING: "The agent's raters trace to one money source that also sits behind several other agents.",
       "NO LINK FOUND": "No funding link found across two hops. Weaker evidence than a link.",
     },
     limits: {

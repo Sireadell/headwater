@@ -1,0 +1,134 @@
+{
+  "rings": [
+    {
+      "kind": "one rater, one family of owners",
+      "source": "0x97cd97cfe21799bacbf39d0a53469e5f82f30996",
+      "agents": [
+        "1829",
+        "2422",
+        "3156",
+        "4078",
+        "4557",
+        "4993",
+        "5117",
+        "5169",
+        "5205",
+        "5240",
+        "5329",
+        "5710",
+        "5720",
+        "5779",
+        "5957",
+        "6149",
+        "6238",
+        "6618",
+        "6858",
+        "6906",
+        "7222",
+        "7362",
+        "7537",
+        "7657",
+        "7753",
+        "7828",
+        "7829",
+        "7889",
+        "8095",
+        "8216",
+        "8220"
+      ],
+      "raters": [
+        "0xa06f907f7ea437ebe60e3d452831ec69e5be43a4",
+        "0xc71a15fcb1149254f97059f6cf3f6ed43990ebd4"
+      ],
+      "owners": [
+        "0x05e6b8c70092c154a2c9f1434579893e0a7dac7b",
+        "0x06e4ad2b9f95c7ec9b84a580b2f4aa7269816557",
+        "0x091825387d8f0f1966eed2ad6c8efb7ab876ad62",
+        "0x1c05a05d69f225ff195c18d6f9e1a70e42243cbe",
+        "0x222f2b06c530a9a1404bb7adbb117ffaa633c3a0",
+        "0x27b7cd80d61dbf3fa34f7c6e55d8f0b53c8c3aef",
+        "0x335a0db1e94d1d3a765e33356256abafc5058dc8",
+        "0x3b3639a93757a37c70a4320806bdabdd0622ad8d",
+        "0x42e6e6b51ffb3b2f6f900e1a99b7e71d92fee8b2",
+        "0x449d490f6a76cafcfff1babeff839d4a5dee139c",
+        "0x481d84086a5aa4971b284d916c0e78d8888a881e",
+        "0x5981cfeafbb76df90934b5ee14d5cbb62a6ee03c",
+        "0x59de0ec4e62fc31e36fc5682e2c3afdf99d31a4d",
+        "0x5b49438db4689adfab2967d1dd15576cae91ebbe",
+        "0x72f9cd551d3d34b2f0fc734df394ee0a639f5b57",
+        "0x73cc5c553985fd3eadbafc140e9d5554274a108a",
+        "0x7c26cfb8ffc3afc2e58175b33955252afadbcc95",
+        "0x857f4d0bf5bc7ff549a7af95dfcb9f7539d75dcb",
+        "0x943b8e7a92dd1a4bc4ee96ea6337a6f208412d00",
+        "0xa9936226bcec34914988d9cd0f3d6780b569b630",
+        "0xb420dd543a9a68138be740ac2ec3f44b43cc9fc1",
+        "0xb73788bf5afc8c3ce75d89645d65d33e37db9800",
+        "0xb9e9bbd21f62153ea7e4f83d67ff81938f9309c6",
+        "0xbedbbc9ac8f8e78b969b224abc1297c6ef623539",
+        "0xcb0e166043b485559d1eaf64f5a52fec8db2e4d4",
+        "0xcf0d7186f3db8b185ae928106c47832a44ce3176",
+        "0xd84382f1fa353222d040e67ff429ad81cceb5a1a",
+        "0xd85978134ec38ae5899748f76624614bd9644524",
+        "0xe4040b00ea4b4765de13abcf983f054ae334b982",
+        "0xf190aac02080c72d94a89eeaa117aa5169016166",
+        "0xf755796c4558a7aa8b0a444e4b31e1a6aaf05128"
+      ]
+    },
+    {
+      "kind": "shared funder",
+      "source": "0xd3868e1ed738ced6945a574a7c769433bed5d474",
+      "agents": [
+        "10168",
+        "10169",
+        "10180",
+        "10181",
+        "10182",
+        "10184",
+        "10189",
+        "10190",
+        "10220",
+        "10223",
+        "10261",
+        "10262"
+      ],
+      "raters": [
+        "0x04eaeddba3b03b9a5abbd2ecb024458c7b1dcefa",
+        "0x350ef06f11e87731476d567b3e5e5d865dcd6657",
+        "0x3a3f992d926da3272e681dc59d23ad63fa77f3a7",
+        "0x3aebb73a33377f0d6fc2195f83559635adee8408",
+        "0x46bdfd8256ceeb3325725cb3b81701c3e2e32ebd",
+        "0x5975442e9608f71cea6e9b1f3841b5a045e0500d",
+        "0x64dbe996e626260f21f5c4fad3c9ba209978c368",
+        "0x7fd9f9e51c9a94b3bca2082c8332cbf708b0b529",
+        "0x914c38fc1aec27912b90609ca82383630d64b5e4",
+        "0x9688385469cd5d216fd5a89eb03ec7fd0e0bd92d",
+        "0xa3279f744438f83bc75ce9f8a8282c448f97cc8a",
+        "0xc059b9cd5b7421a28f9259adb4511418fd548b5e",
+        "0xedc637d4b1bb9069753cc9335942be932083d2d0"
+      ],
+      "owners": [
+        "0x103040545ac5031a11e8c03dd11324c7333a13c7"
+      ]
+    },
+    {
+      "kind": "one rater, one family of owners",
+      "source": "0x4ecc1ae58524547eabd303d5a2ebad94c83e8282",
+      "agents": [
+        "141",
+        "142",
+        "145",
+        "146"
+      ],
+      "raters": [
+        "0x071a21c5db495d54de4553d0a294bae2edc9efde"
+      ],
+      "owners": [
+        "0x12e9e3eee25cbf776248b344c15565774f273bd2",
+        "0x196f1c0fada13b5048c7db5552d7d248e052f209",
+        "0xaea69f27787bb4af75cc0f5d10bc1865989700ce",
+        "0xefcd1bbe18977c9d42332613b18aba06ce10a5a3"
+      ]
+    }
+  ],
+  "generatedAt": "2026-10-06T11:33:22.482Z"
+}

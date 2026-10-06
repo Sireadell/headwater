@@ -642,6 +642,16 @@ async function checkAgent() {
         const payments = await tracePayments(agent.owner, raterAddrs, ratings.firstRatedAt);
         const raterTypes = await classifyRaters(raterAddrs);
         const selfRated = raterAddrs.includes(agent.owner.toLowerCase()) ? 1 : 0;
+        // Rings need the whole chain at once, so the page reads the copy the
+        // API build published rather than walking every rating itself. If
+        // that file is missing the verdict simply makes no ring claim.
+        let rings = [];
+        try {
+          const res = await fetch("api/rings.json");
+          if (res.ok) rings = ((await res.json()).rings || []).filter((r) => r.agents.includes(String(agentId)));
+        } catch (ringErr) {
+          console.warn("rings unavailable:", ringErr.message);
+        }
         provenance = {
           funding,
           payments,
@@ -654,6 +664,8 @@ async function checkAgent() {
             raterTypes,
             selfRated,
             payments,
+            rings,
+            agentId: String(agentId),
           }),
         };
       } catch (provErr) {

@@ -12,6 +12,7 @@
     "APP GENERATED": "Raters are application contracts recording outcomes, not people.",
     "OWNER FUNDED": "The agent's own owner paid for its raters, directly or via one hop.",
     "ROUND TRIP": "The owner paid its raters and the same wallets sent funds back to the owner after rating. The money left the owner and returned to the owner.",
+    "RING": "The agent's raters trace to one money source that also sits behind several other agents.",
     "NO LINK FOUND": "No funding link found across two hops. Weaker evidence than a link."
   },
   "limits": {
@@ -20,15 +21,15 @@
     "note": "Funding moved by an internal contract call does not appear in top-level transactions, so absence of a link is weaker evidence than a link."
   },
   "counts": {
-    "agentsRegistered": 10281,
+    "agentsRegistered": 10288,
     "agentsEverRated": 94,
     "byVerdict": {
       "ROUND TRIP": 3,
-      "THIN": 56,
+      "THIN": 17,
       "SELF REVIEWED": 10,
       "OWNER FUNDED": 16,
       "APP GENERATED": 6,
-      "NO LINK FOUND": 3
+      "RING": 42
     }
   },
   "agents": [
@@ -104,7 +105,7 @@
     },
     {
       "agentId": "10261",
-      "verdict": "NO LINK FOUND",
+      "verdict": "RING",
       "distinctRaters": 3,
       "feedbackCount": 12,
       "ownerFunded": 0
@@ -160,7 +161,7 @@
     },
     {
       "agentId": "146",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 9,
       "ownerFunded": 0
@@ -181,7 +182,7 @@
     },
     {
       "agentId": "145",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 6,
       "ownerFunded": 0
@@ -195,14 +196,14 @@
     },
     {
       "agentId": "10184",
-      "verdict": "NO LINK FOUND",
+      "verdict": "RING",
       "distinctRaters": 3,
       "feedbackCount": 5,
       "ownerFunded": 0
     },
     {
       "agentId": "10220",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 5,
       "ownerFunded": 0
@@ -279,7 +280,7 @@
     },
     {
       "agentId": "6238",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 3,
       "ownerFunded": 0
@@ -293,7 +294,7 @@
     },
     {
       "agentId": "10189",
-      "verdict": "NO LINK FOUND",
+      "verdict": "RING",
       "distinctRaters": 2,
       "feedbackCount": 2,
       "ownerFunded": 0
@@ -307,7 +308,7 @@
     },
     {
       "agentId": "141",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 2,
       "ownerFunded": 0
@@ -342,21 +343,21 @@
     },
     {
       "agentId": "5779",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 2,
       "ownerFunded": 0
     },
     {
       "agentId": "7222",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 2,
       "ownerFunded": 0
     },
     {
       "agentId": "7753",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 2,
       "ownerFunded": 0
@@ -405,7 +406,7 @@
     },
     {
       "agentId": "10190",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -419,14 +420,14 @@
     },
     {
       "agentId": "10223",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "10262",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -454,14 +455,14 @@
     },
     {
       "agentId": "142",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "1829",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -482,7 +483,7 @@
     },
     {
       "agentId": "2422",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -496,14 +497,14 @@
     },
     {
       "agentId": "3156",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "4078",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -517,161 +518,161 @@
     },
     {
       "agentId": "4557",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "4993",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5117",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5169",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5205",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5240",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5329",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5710",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5720",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "5957",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "6149",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "6618",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "6858",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "6906",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7362",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7537",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7657",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7828",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7829",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "7889",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "8095",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "8216",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
     },
     {
       "agentId": "8220",
-      "verdict": "THIN",
+      "verdict": "RING",
       "distinctRaters": 1,
       "feedbackCount": 1,
       "ownerFunded": 0
@@ -692,5 +693,5 @@
     }
   ],
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:54:31.050Z"
+  "generatedAt": "2026-10-06T11:38:23.522Z"
 }

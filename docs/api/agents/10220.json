@@ -3,12 +3,13 @@
   "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
   "agentURI": "https://execution.market/workers/0x46bdfd8256ceeb3325725cb3b81701c3e2e32ebd",
   "registeredAt": 1787540225,
-  "verdict": "THIN",
+  "verdict": "RING",
   "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 93 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "summary": "This agent's ratings trace to a group that also rated 11 other agents. Looked at alone, this agent's reviews seem ordinary. Looked at across the chain, the same money source sits behind all of them. That describes where the money and the ratings came from, not why, and a group of related agents can be perfectly legitimate. It does mean these reviews are not independent of each other.",
   "findings": [
     "1 of the 1 raters checked are contracts rather than wallets.",
-    "Every rating came from one single address."
+    "Every rating came from one single address.",
+    "Wallet 0xd3868e1e... funded 13 raters that rated 12 agents, this one and 11 others. It is not this agent's owner, so a check that only follows the owner's money would miss it."
   ],
   "evidence": {
     "feedbackCount": 5,
@@ -25,6 +26,27 @@
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
+    "rings": [
+      {
+        "kind": "shared funder",
+        "source": "0xd3868e1ed738ced6945a574a7c769433bed5d474",
+        "agents": [
+          "10168",
+          "10169",
+          "10180",
+          "10181",
+          "10182",
+          "10184",
+          "10189",
+          "10190",
+          "10220",
+          "10223",
+          "10261",
+          "10262"
+        ],
+        "raters": 13
+      }
+    ],
     "independentPaidBeforeRating": 0
   },
   "limits": {
@@ -36,5 +58,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:51:24.102Z"
+  "generatedAt": "2026-10-06T11:35:10.656Z"
 }

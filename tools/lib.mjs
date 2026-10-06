@@ -71,8 +71,8 @@ export async function graphql(query, variables, attempt = 0) {
 globalThis.graphql = graphql;
 
 const provenanceSrc = readFileSync(join(root, "docs/provenance.js"), "utf8");
-export const { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict } = new Function(
-  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict };`,
+export const { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings } = new Function(
+  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings };`,
 )();
 
 const PAGE = 1000;
@@ -111,11 +111,57 @@ export async function ratersOf(agentId) {
   return { raters: [...new Set(ids)], feedbackCount: ids.length, firstRatedAt };
 }
 
+// Every rating, every rated agent's owner and every funding record behind
+// those wallets, then the rings in them. About thirty requests, so it runs
+// once per build or once per MCP session, never once per agent.
+export async function loadRings() {
+  const feedback = [];
+  for (let offset = 0; ; offset += PAGE) {
+    const data = await graphql(
+      `query All($offset: Int!) {
+         Feedback(limit: ${PAGE}, offset: $offset, order_by: { id: asc }) { agent_id reviewer_id }
+       }`,
+      { offset },
+    );
+    const rows = data.Feedback || [];
+    feedback.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  const ids = [...new Set(feedback.map((f) => f.agent_id))];
+  const agents = (await graphql(
+    `query Owners($ids: [String!]!) { Agent(where: { id: { _in: $ids } }) { id owner } }`,
+    { ids },
+  )).Agent || [];
+  const wallets = [
+    ...new Set([...feedback.map((f) => f.reviewer_id.toLowerCase()), ...agents.map((a) => a.owner.toLowerCase())]),
+  ];
+  const funders = [];
+  for (let i = 0; i < wallets.length; i += 500) {
+    const batch = wallets.slice(i, i + 500);
+    for (let offset = 0; ; offset += PAGE) {
+      const data = await graphql(
+        `query F($w: [String!]!, $offset: Int!) {
+           WalletFunder(where: { wallet: { _in: $w } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
+             wallet funder isDust
+           }
+         }`,
+        { w: batch, offset },
+      );
+      const rows = data.WalletFunder || [];
+      funders.push(...rows);
+      if (rows.length < PAGE) break;
+    }
+  }
+  return findRings({ feedback, agents, funders });
+}
+
+let ringsCache = null;
+
 // The whole answer for one agent, in the shape the API and the MCP tool both
 // return. An agent that does not exist returns null rather than an empty
 // verdict, because "no such agent" and "an agent nobody has rated" are
 // different answers and collapsing them would mislead a caller.
-export async function checkAgent(agentId) {
+export async function checkAgent(agentId, { rings } = {}) {
   const data = await graphql(
     `query Agent($id: String!) { Agent(where: { id: { _eq: $id } }) { id owner agentURI registeredAtTimestamp } }`,
     { id: String(agentId) },
@@ -129,7 +175,11 @@ export async function checkAgent(agentId) {
   const payments = await tracePayments(owner, raters, firstRatedAt);
   const raterTypes = await classifyRaters(raters);
   const selfRated = raters.includes(owner) ? 1 : 0;
+  if (!rings) rings = ringsCache ??= await loadRings();
+  const myRings = rings.filter((r) => r.agents.includes(String(agentId)));
   const verdict = buildVerdict({
+    agentId: String(agentId),
+    rings: myRings,
     owner,
     reviewers: raters,
     feedbackCount,
@@ -170,6 +220,9 @@ export async function checkAgent(agentId) {
       // separately from a bare payment count because the two support opposite
       // readings of the same score.
       roundTripped: payments.paidAfter.filter((p) => ownerFundedSet.has(p.rater)).length,
+      // Groups reaching across several agents. Each entry names the wallet
+      // behind it and every agent it touches, so a caller can check it.
+      rings: myRings.map((r) => ({ kind: r.kind, source: r.source, agents: r.agents, raters: r.raters.length })),
       independentPaidBeforeRating: payments.paidBefore.filter((p) => !ownerFundedSet.has(p.rater))
         .length,
     },

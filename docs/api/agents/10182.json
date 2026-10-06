@@ -8,7 +8,8 @@
   "summary": "The wallet that owns this agent is among the wallets rating it.",
   "findings": [
     "The owner's own wallet is among the raters.",
-    "15 of the 16 raters checked are contracts rather than wallets."
+    "15 of the 16 raters checked are contracts rather than wallets.",
+    "Wallet 0xd3868e1e... funded 13 raters that rated 12 agents, this one and 11 others. It is not this agent's owner, so a check that only follows the owner's money would miss it."
   ],
   "evidence": {
     "feedbackCount": 78,
@@ -25,6 +26,27 @@
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
+    "rings": [
+      {
+        "kind": "shared funder",
+        "source": "0xd3868e1ed738ced6945a574a7c769433bed5d474",
+        "agents": [
+          "10168",
+          "10169",
+          "10180",
+          "10181",
+          "10182",
+          "10184",
+          "10189",
+          "10190",
+          "10220",
+          "10223",
+          "10261",
+          "10262"
+        ],
+        "raters": 13
+      }
+    ],
     "independentPaidBeforeRating": 0
   },
   "limits": {
@@ -36,5 +58,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:50:16.911Z"
+  "generatedAt": "2026-10-06T11:34:15.257Z"
 }

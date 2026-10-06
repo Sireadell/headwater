@@ -51,6 +51,7 @@ Headwater classifies agents with verdicts like:
 | `APP GENERATED` | Ratings appear to come from application contracts |
 | `OWNER FUNDED` | The owner funded raters directly or through one hop |
 | `ROUND TRIP` | Funds moved from owner to rater, then back after rating |
+| `RING` | One money source sits behind the raters of several agents |
 | `NO LINK FOUND` | No funding link was found in the checked path |
 
 These are evidence labels, not accusations.

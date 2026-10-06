@@ -267,12 +267,15 @@ async function traceOwnerFunding(owner, raterIds) {
 // paid for these raters" is checkable. "These reviews are fake" is a claim
 // about somebody's intent, is not checkable, and was wrong the one time this
 // project tried it.
-function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated, payments }) {
+function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated, payments, rings, agentId }) {
   const findings = [];
   // Absent payment data is not the same as no payments, so an older caller
   // that does not supply it gets an empty record and no payment claim is made
   // in either direction.
   const pay = payments || { paidBefore: [], paidAfter: [], paidUnknownTime: [], tracedRaters: 0 };
+  // Same reasoning for rings: a caller that has not loaded the chain-wide view
+  // gets no ring claim either way, rather than an implied "no ring".
+  const myRings = rings || [];
 
   if (feedbackCount === 0) {
     return {
@@ -344,6 +347,7 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
     );
   }
   if (reviewers.length === 1) findings.push("Every rating came from one single address.");
+  for (const ring of myRings) findings.push(describeRing(ring, agentId));
 
   const ownerPaid = funding.direct.length + funding.indirect.length;
 
@@ -422,6 +426,24 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       findings,
     };
   }
+  // Below OWNER FUNDED and SELF REVIEWED, because the owner paying for raters
+  // or rating itself is the more direct fact when both are true. Above THIN,
+  // because THIN describes one agent and misses what makes these cases notable: each agent on its own looks
+  // ordinary, often a single review, and only the group shows the pattern.
+  if (myRings.length > 0) {
+    const biggest = myRings[0];
+    return {
+      label: "RING",
+      tone: "amber",
+      summary:
+        `This agent's ratings trace to a group that also rated ${biggest.agents.length - 1} other ` +
+        "agents. Looked at alone, this agent's reviews seem ordinary. Looked at across the chain, " +
+        "the same money source sits behind all of them. That describes where the money and the " +
+        "ratings came from, not why, and a group of related agents can be perfectly legitimate. It " +
+        "does mean these reviews are not independent of each other.",
+      findings,
+    };
+  }
   if (reviewers.length === 1) {
     return {
       label: "THIN",
@@ -443,4 +465,154 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       "weaker evidence than a link would be.",
     findings,
   };
+}
+
+// Groups that reach across several agents, found from the whole chain at once.
+//
+// Everything above looks at one agent and its own raters, which cannot see a
+// group that spreads itself thin: thirteen wallets each rating a different
+// agent look like thirteen unrelated single ratings until you notice the same
+// wallet paid all thirteen. That needs every rating and every funding record
+// on the chain in one place, so it runs where those are already loaded (the
+// API build and the MCP server) and the page reads the result from
+// api/rings.json.
+//
+// Two shapes are reported, both measured on chain on 2026-10-06:
+//
+//   1. One outside wallet funded the raters of several agents. Wallet
+//      0xd3868e1e funded 13 raters, and each of them rated a different agent
+//      owned by the same fleet owner. The funder is not that owner, so the
+//      owner-funding check above does not see it.
+//   2. One rater covered several agents whose owners share a funder. Agent
+//      182's owner funded 33 wallets that rated agent 182 and then registered
+//      agents of their own. Two wallets between them rated 31 of those
+//      agents, and each of the 31 looks like an agent with one ordinary review.
+//
+// Two guards keep this from naming ordinary behaviour. A shared funder only
+// counts on an agent where the wallets it funded are at least half of that
+// agent's raters, so a public faucet that happens to have topped up a few
+// raters here and there does not turn the chain into one ring. And a rater
+// who reviews widely is not a ring by itself; it takes three or more agents
+// whose owners all trace to the same funder.
+const RING_MIN_AGENTS = 3;
+
+function findRings({ feedback, agents, funders }) {
+  const ownerOf = new Map(agents.map((a) => [String(a.id), a.owner.toLowerCase()]));
+  const ratersOf = new Map();
+  for (const f of feedback) {
+    const id = String(f.agent_id);
+    if (!ratersOf.has(id)) ratersOf.set(id, new Set());
+    ratersOf.get(id).add(f.reviewer_id.toLowerCase());
+  }
+  // Dust is left out here. A gas top-up links two wallets, but it does not say
+  // who paid for a wallet to exist, and a ring claim should rest on the money
+  // that did.
+  const fundedBy = new Map();
+  for (const r of funders) {
+    if (r.isDust) continue;
+    const w = r.wallet.toLowerCase();
+    if (!fundedBy.has(w)) fundedBy.set(w, new Set());
+    fundedBy.get(w).add(r.funder.toLowerCase());
+  }
+
+  const rings = [];
+
+  // Shape 1: funder -> agent -> raters it funded there.
+  const byFunder = new Map();
+  for (const [agentId, raters] of ratersOf) {
+    for (const rater of raters) {
+      for (const funder of fundedBy.get(rater) || []) {
+        // The owner paying its own raters is OWNER FUNDED, already reported.
+        if (funder === ownerOf.get(agentId)) continue;
+        if (!byFunder.has(funder)) byFunder.set(funder, new Map());
+        const m = byFunder.get(funder);
+        if (!m.has(agentId)) m.set(agentId, new Set());
+        m.get(agentId).add(rater);
+      }
+    }
+  }
+  for (const [funder, m] of byFunder) {
+    const counted = [...m].filter(([agentId, funded]) => funded.size * 2 >= ratersOf.get(agentId).size);
+    const raters = new Set(counted.flatMap(([, funded]) => [...funded]));
+    // One funded wallet rating many agents is one rater, and shape 2 is the
+    // place for that. A group needs at least two members.
+    if (counted.length < RING_MIN_AGENTS || raters.size < 2) continue;
+    rings.push({
+      kind: "shared funder",
+      source: funder,
+      agents: counted.map(([id]) => id).sort((a, b) => a - b),
+      raters: [...raters].sort(),
+      owners: [...new Set(counted.map(([id]) => ownerOf.get(id)))].sort(),
+    });
+  }
+
+  // Shape 2: rater -> funder of the owners it rated -> agents.
+  const agentsRatedBy = new Map();
+  for (const [agentId, raters] of ratersOf) {
+    for (const rater of raters) {
+      if (!agentsRatedBy.has(rater)) agentsRatedBy.set(rater, []);
+      agentsRatedBy.get(rater).push(agentId);
+    }
+  }
+  const family = new Map();
+  for (const [rater, rated] of agentsRatedBy) {
+    if (rated.length < RING_MIN_AGENTS) continue;
+    const byOwnerFunder = new Map();
+    for (const agentId of rated) {
+      const owner = ownerOf.get(agentId);
+      if (!owner || owner === rater) continue;
+      // Same half-or-more rule as shape 1: on an agent with many raters, one
+      // of them is not the agent's reputation.
+      if (ratersOf.get(agentId).size > 2) continue;
+      for (const funder of fundedBy.get(owner) || []) {
+        if (funder === rater) continue;
+        if (!byOwnerFunder.has(funder)) byOwnerFunder.set(funder, new Set());
+        byOwnerFunder.get(funder).add(agentId);
+      }
+    }
+    for (const [funder, ids] of byOwnerFunder) {
+      const owners = new Set([...ids].map((id) => ownerOf.get(id)));
+      if (owners.size < RING_MIN_AGENTS) continue;
+      // Two raters working the same family are one ring, not two, so rings
+      // with the same source are merged.
+      const same = family.get(funder);
+      if (same) {
+        same.raters.add(rater);
+        for (const id of ids) same.agents.add(id);
+      } else {
+        family.set(funder, { raters: new Set([rater]), agents: new Set(ids) });
+      }
+    }
+  }
+  for (const [funder, { raters, agents: ids }] of family) {
+    rings.push({
+      kind: "one rater, one family of owners",
+      source: funder,
+      agents: [...ids].sort((a, b) => a - b),
+      raters: [...raters].sort(),
+      owners: [...new Set([...ids].map((id) => ownerOf.get(id)))].sort(),
+    });
+  }
+
+  return rings.sort((a, b) => b.agents.length - a.agents.length);
+}
+
+// The plain sentence for one ring, as seen from one of its agents.
+function describeRing(ring, agentId) {
+  const others = ring.agents.filter((id) => id !== String(agentId)).length;
+  const funder = `${ring.source.slice(0, 10)}...`;
+  if (ring.kind === "shared funder") {
+    return (
+      `Wallet ${funder} funded ${ring.raters.length} raters that rated ${ring.agents.length} agents, ` +
+      `this one and ${others} other${others === 1 ? "" : "s"}. It is not this agent's owner, so a ` +
+      "check that only follows the owner's money would miss it."
+    );
+  }
+  return (
+    (ring.raters.length === 1
+      ? `The wallet that rated this agent also rated ${others} other${others === 1 ? "" : "s"}`
+      : `This agent's rater is one of ${ring.raters.length} wallets that between them rated ${ring.agents.length} agents`) +
+    `, and the owners of all ${ring.agents.length} were funded by the same wallet, ${funder} Each agent looks like it has one ordinary review until they are ` +
+    "put side by side."
+  );
 }

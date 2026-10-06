@@ -3,11 +3,12 @@
   "owner": "0x05e6b8c70092c154a2c9f1434579893e0a7dac7b",
   "agentURI": "https://eve-8004.vercel.app/metadata/b.json",
   "registeredAt": 1771290098,
-  "verdict": "THIN",
+  "verdict": "RING",
   "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 93 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "summary": "This agent's ratings trace to a group that also rated 30 other agents. Looked at alone, this agent's reviews seem ordinary. Looked at across the chain, the same money source sits behind all of them. That describes where the money and the ratings came from, not why, and a group of related agents can be perfectly legitimate. It does mean these reviews are not independent of each other.",
   "findings": [
-    "Every rating came from one single address."
+    "Every rating came from one single address.",
+    "This agent's rater is one of 2 wallets that between them rated 31 agents, and the owners of all 31 were funded by the same wallet, 0x97cd97cf... Each agent looks like it has one ordinary review until they are put side by side."
   ],
   "evidence": {
     "feedbackCount": 1,
@@ -24,6 +25,46 @@
     "paidOwnerBeforeRating": 0,
     "paidOwnerAfterRating": 0,
     "roundTripped": 0,
+    "rings": [
+      {
+        "kind": "one rater, one family of owners",
+        "source": "0x97cd97cfe21799bacbf39d0a53469e5f82f30996",
+        "agents": [
+          "1829",
+          "2422",
+          "3156",
+          "4078",
+          "4557",
+          "4993",
+          "5117",
+          "5169",
+          "5205",
+          "5240",
+          "5329",
+          "5710",
+          "5720",
+          "5779",
+          "5957",
+          "6149",
+          "6238",
+          "6618",
+          "6858",
+          "6906",
+          "7222",
+          "7362",
+          "7537",
+          "7657",
+          "7753",
+          "7828",
+          "7829",
+          "7889",
+          "8095",
+          "8216",
+          "8220"
+        ],
+        "raters": 2
+      }
+    ],
     "independentPaidBeforeRating": 0
   },
   "limits": {
@@ -35,5 +76,5 @@
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
   "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-05T22:53:19.579Z"
+  "generatedAt": "2026-10-06T11:37:14.087Z"
 }
