@@ -1,111 +1,88 @@
 # Headwater
 
-Independent funding-provenance audit for ERC-8004 agent reputation on
-Monad. Monad Metropolis submission.
+Headwater is a reputation context tool for ERC-8004 agents on Monad.
 
-An empirical study of ERC-8004 across Ethereum, BSC and Base found most
-reviewer activity was Sybil-coordinated, not real. The one live tool that
-screens for this scores by reviewer wallet age. Age is easy to fake, and
-it structurally misses the patterns Headwater looks for: the same
-reviewer wallet showing up across agents it has no real reason to know,
-one wallet funding many "independent" reviewers, and one relayer paying
-gas for many wallets that each look unrelated on their own.
+I built it because reviews can look trustworthy and still mislead people.
 
-See `HONESTY.md` for exactly what's real, what's simplified and disclosed,
-and what isn't built yet. See `ORIGIN.md` for where the detection code
-came from. See `hackathons/monad-metropolis/BUILD_PLAN.md` in the wider
-hackathons folder for the full build plan.
+Most people already understand this from normal internet life. An app can have thousands of good reviews and still be unsafe or low quality. A P2P trader can look reliable because their profile is full of positive feedback, then still delay payment, shortchange you, or behave differently once real money is involved.
 
-## Live indexer (Envio)
+Agent reputation has the same problem, but with higher stakes.
 
-A separate deployed service, [`Sireadell/headwater-indexer`](https://github.com/Sireadell/headwater-indexer)
-on Envio Cloud, reads the ERC-8004 registries from block 0 and, the
-moment a wallet first appears as a rater or an agent owner, queries
-Envio HyperSync for that one wallet's entire native-MON history back to
-genesis. That is where every funding edge in this product comes from.
+ERC-8004 gives agents a public reputation trail. That is useful, but a raw score is not enough. A score can be inflated by thin activity, self-review, repeated wallets, funded raters, or app-generated feedback that looks like human trust from the outside.
 
-Envio is not decoration here, and the deletion test is one command. The
-public Monad RPC answers `eth_getLogs is limited to a 100 range`, and a
-native MON transfer emits no log at all, so the public RPC cannot
-produce a funding trace over 107 million blocks by any route. Remove
-HyperSync and the central promise of this product is gone.
+Headwater asks the question the score does not answer:
 
-It also computes circular funding, funder fan-out, review cadence,
-wallet birth times and shared funders as live, continuously updated
-entities. That repo's `config.yaml` and `schema.graphql` are the source
-of truth for exactly what's indexed.
-
-Nansen is **not** part of this. See `HONESTY.md`.
-
-## Running the tests
-
-```
-npm test
+```txt
+Before I trust this agent, what is its reputation actually made of?
 ```
 
-## Seeing it work
+Headwater does not call every suspicious pattern fraud. It does not guess intent. It reads the public trail behind the reputation and explains the context in plain verdicts other agents, wallets, and marketplaces can use.
 
-```
-node scripts/demo.mjs
-```
+Headwater is a Monad Metropolis submission.
 
-Runs two checks against real registered ERC-8004 agents on Monad mainnet,
-no mocks, no setup beyond `npm install`, under a minute:
+## Why this matters
 
-1. Cross-agent review overlap: does the same reviewer wallet show up on
-   more than one agent? Registry data only, no chain scanning, fast. On
-   the first live run this caught five different reviewer wallets all
-   clustered around reviewing the exact same six agents.
-2. Funding check: were an agent's own reviewers funded by the same
-   wallet? Slower (raw log scanning per reviewer), run on a smaller
-   sample to stay judge-runnable.
+ERC-8004 is important because agents need a way to build and show trust across the open internet.
 
-Every real finding gets logged to `data/predictions.json` as an explicit,
-dated claim.
+But reputation only helps if people understand where it came from.
 
-## The scoreboard
+A score can look strong because:
 
-```
-node scripts/scoreboard.mjs
-```
+- one wallet gave all the ratings
+- the owner rated their own agent
+- the owner funded the wallets that later rated the agent
+- the feedback came from app contracts, not individual users
+- one coordinated group touched many agents
+- the evidence is simply too thin to trust yet
 
-Shows the running track record: every claim this tool has made, whether
-it's since been confirmed, refuted, or is still honestly labeled
-`UNVALIDATED` because nothing external exists yet to check it against.
+Those cases do not always mean fraud. Some are normal. Some are apps recording real outcomes. Some are just too weak to rely on.
 
-```
-node scripts/generateScoreboardPage.mjs
-```
+Headwater turns those patterns into plain context before another agent, wallet, or marketplace trusts the score.
 
-Regenerates `docs/scoreboard.html`, a static page version of the same
-thing, open it directly in a browser.
+## What Headwater checks
 
-## Calling Headwater from an agent
+Headwater classifies agents with verdicts like:
 
-Monad's ERC-8004 documentation tells agents to check reputation before a
-high-value transaction. The registry answers "what is the score". It does not
-answer "is that score worth anything", which on Monad is the question that
-matters: of more than 10,000 registered agents, 93 have ever been rated, and the single
-most-rated agent had all 7,665 of its raters funded by its own owner.
+| Verdict | Meaning |
+|---|---|
+| `NO EVIDENCE` | The agent has no rating history yet |
+| `THIN` | All ratings came from one address |
+| `SELF REVIEWED` | The owner's wallet is also a rater |
+| `APP GENERATED` | Ratings appear to come from application contracts |
+| `OWNER FUNDED` | The owner funded raters directly or through one hop |
+| `ROUND TRIP` | Funds moved from owner to rater, then back after rating |
+| `NO LINK FOUND` | No funding link was found in the checked path |
 
-There are two ways to ask.
+These are evidence labels, not accusations.
 
-### Static JSON API
+For example, a group of agents can look coordinated until the contracts are decoded. Some Monad agents receive positive and negative ratings from game contracts, where the two scores represent a winner and a loser. Headwater labels those as `APP GENERATED` instead of calling them manipulation.
 
-No key, no rate limit, no server. As fresh as the last build.
+## Live data
 
-```
+Headwater uses a separate Envio indexer:
+
+https://github.com/Sireadell/headwater-indexer
+
+That indexer reads Monad ERC-8004 registry activity and traces native MON funding history with Envio HyperSync.
+
+This matters because the public Monad RPC cannot do the same job. It limits `eth_getLogs` to a 100 block range, and native MON transfers do not emit logs. Without HyperSync, Headwater cannot trace funding history across the chain in a useful way.
+
+Nansen is not currently used in the live verdicts. See `HONESTY.md` for the exact status.
+
+## Use the API
+
+No key. No server setup. The static API is published with the site.
+
+```txt
 GET https://sireadell.github.io/headwater/api/index.json
 GET https://sireadell.github.io/headwater/api/agents/182.json
 ```
 
-An agent id with no file has never been rated. That is the verdict
-`NO EVIDENCE`, not an error, and it is the normal case on this chain.
+If an agent has no file, it has no rating history in the published data. That means `NO EVIDENCE`, not a broken request.
 
-### MCP server
+## Use the MCP server
 
-Answers live against the indexer, and covers every agent rather than only the
-rated ones. No dependencies.
+Agents can also call Headwater directly through MCP.
 
 ```json
 {
@@ -118,31 +95,78 @@ rated ones. No dependencies.
 }
 ```
 
-One tool, `check_agent_reputation`, taking an `agentId`.
+Tool:
 
-### Verdicts
+```txt
+check_agent_reputation
+```
 
-| Verdict | Meaning |
-|---|---|
-| `NO EVIDENCE` | Never rated. Nothing to trust or distrust |
-| `THIN` | Every rating came from a single address |
-| `SELF REVIEWED` | The owner's own wallet is among the raters |
-| `APP GENERATED` | Raters are application contracts recording outcomes, not people |
-| `OWNER FUNDED` | The owner paid for its raters, directly or through one intermediary |
-| `NO LINK FOUND` | No funding link across two hops. Weaker evidence than a link would be |
+Input:
 
-### What a verdict does not say
+```txt
+agentId
+```
 
-It describes where money came from. It is not a judgement of intent, and a
-funded campaign can be entirely legitimate. Agents 153 to 158 read as a
-coordinated ring until the rating contracts are decoded and turn out to expose
-`createGame`, `games` and `getRound`: every transaction carries one positive
-and one negative score, which is a winner and a loser. They are classified
-`APP GENERATED` for that reason.
+The page, JSON API, and MCP server all use the same verdict rules from `docs/provenance.js`.
 
-Funding is traced over two hops in native MON. Money moved by an internal
-contract call does not appear in top-level transactions, so the absence of a
-link is weaker evidence than a link.
+## Run locally
 
-The page, the JSON API and the MCP server all read the same rules from
-`docs/provenance.js`, so they cannot answer the same question differently.
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run tests:
+
+```bash
+npm test
+```
+
+Run the demo:
+
+```bash
+node scripts/demo.mjs
+```
+
+The demo checks real Monad ERC-8004 agents and writes dated claims to:
+
+```txt
+data/predictions.json
+```
+
+## Scoreboard
+
+Headwater keeps a record of the claims it has made.
+
+```bash
+node scripts/scoreboard.mjs
+```
+
+To rebuild the static scoreboard page:
+
+```bash
+node scripts/generateScoreboardPage.mjs
+```
+
+Then open:
+
+```txt
+docs/scoreboard.html
+```
+
+## Honesty notes
+
+Headwater is intentionally narrow.
+
+It does not decide whether an agent is good or bad. It does not claim that funded ratings are always fake. It does not replace human review, app-specific context, or future reputation systems.
+
+It answers one practical question:
+
+```txt
+Before I trust this ERC-8004 score, what should I know about where it came from?
+```
+
+For exact limits, simplifications, and unfinished work, read `HONESTY.md`.
+
+For where the detection logic came from, read `ORIGIN.md`.
