@@ -279,3 +279,27 @@ a:hover { color: var(--accent-hover); }
 .compare-card .badge { margin-left: 4px; }
 .footnote a { color: inherit; text-decoration: underline; }
 @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } .compare-num { font-size: 32px; } }
+
+/* Phones: keep the menu, and stack wide rows instead of squeezing them */
+@media (max-width: 900px) {
+  .topbar { flex-wrap: wrap; height: auto; padding-top: 12px; padding-bottom: 8px; row-gap: 8px; }
+  .nav { display: flex; order: 3; width: 100%; overflow-x: auto; margin: 0 -6px; }
+  .navlink { padding: 8px 9px; font-size: 13px; white-space: nowrap; }
+  .nav { scrollbar-width: none; gap: 0; }
+}
+@media (max-width: 640px) {
+  .finding-head { flex-wrap: wrap; gap: 6px 16px; }
+  .score-stats { grid-template-columns: 1fr; }
+  .score-stat { padding: 14px 20px; border-right: none; border-bottom: 1px solid var(--border-soft); }
+  .table-head { display: none; }
+  .table-row { flex-wrap: wrap; gap: 6px 12px; }
+  .col-wallet { flex: 0 0 auto; min-width: 60px; }
+  .col-agents { width: auto; flex: 1 1 200px; }
+  .col-signal { width: auto; }
+  .claim-row { flex-wrap: wrap; gap: 8px 16px; }
+  .claim-title { flex: 1 1 100%; min-width: 0; padding-right: 0; overflow-wrap: anywhere; }
+  .claim-date, .claim-status, .claim-evidence { width: auto; }
+  .method-row { flex-direction: column; gap: 6px; }
+  .method-label { width: auto; }
+  .method-desc { overflow-wrap: anywhere; }
+}
