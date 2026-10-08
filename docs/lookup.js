@@ -199,6 +199,41 @@ function renderError(message) {
   document.getElementById("results").innerHTML = `<div class="error-state">Query failed: ${message}</div>`;
 }
 
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+// Returns false when no snapshot exists for this agent, so the caller can
+// fall back to the plain error. Agents nobody has rated have no file.
+async function renderSnapshot(agentId, reason) {
+  if (!/^\d+$/.test(agentId)) return false;
+  let snap;
+  try {
+    const res = await fetch(`api/agents/${agentId}.json`);
+    if (!res.ok) return false;
+    snap = await res.json();
+  } catch {
+    return false;
+  }
+  const tone = { red: "prov-red", amber: "prov-amber" }[snap.tone] || "prov-mut";
+  const badge = { red: "badge-red", amber: "badge-amber" }[snap.tone] || "badge-mut";
+  const when = (snap.generatedAt || "").slice(0, 10);
+  document.getElementById("results").innerHTML = `
+    <div class="lookup-body" style="flex-direction: column; gap: 0;">
+    <p class="footnote" style="margin: 0 0 16px;" title="${escapeHtml(reason)}">The live index is not answering right now. This is the saved verdict from ${escapeHtml(when)}.</p>
+    <div class="prov-card ${tone}">
+      <div class="prov-head">
+        <span class="badge ${badge} mono">${escapeHtml(snap.verdict)}</span>
+        <span class="prov-title">Agent ${escapeHtml(snap.agentId)}</span>
+      </div>
+      <p class="prov-summary">${escapeHtml(snap.summary)}</p>
+      <ul class="prov-findings">${(snap.findings || []).map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
+      <p class="prov-basis mono">Owner ${escapeHtml(snap.owner)} &middot; snapshot ${escapeHtml(when)} &middot; <a href="api/agents/${escapeHtml(snap.agentId)}.json">raw JSON</a></p>
+    </div>
+    </div>`;
+  return true;
+}
+
 function renderAgent(agentId, agent, walletDetail, provenance) {
   if (!agent) {
     document.getElementById("results").innerHTML = `<div class="empty-state">No agent found with id ${agentId}.</div>`;
@@ -675,7 +710,10 @@ async function checkAgent() {
 
     renderAgent(agentId, agent, walletDetail, provenance);
   } catch (err) {
-    renderError(err.message);
+    // The live index can be down (a free deployment expires, or a rebuild is
+    // in progress). The API build publishes every rated agent's verdict as a
+    // file, so show that, clearly dated, instead of an error.
+    if (!(await renderSnapshot(agentId, err.message))) renderError(err.message);
   }
 }
 

@@ -92,6 +92,7 @@
         ws.send(JSON.stringify({ id: "1", type: "subscribe", payload: { query: QUERY } }));
       } else if (d.type === "next" && d.payload && d.payload.data) {
         setStatus("live", true);
+        box.dataset.hadData = "1";
         render(d.payload.data.Feedback);
       } else if (d.type === "ping") {
         ws.send(JSON.stringify({ type: "pong" }));
@@ -99,6 +100,12 @@
     };
     ws.onclose = () => {
       setStatus("reconnecting", false);
+      // After a few failed tries the index is probably down rather than
+      // blinking, so say so plainly. Retrying carries on in the background.
+      if (retry >= 3 && !box.dataset.hadData) {
+        box.innerHTML =
+          '<div class="live-row">The live index is offline right now. Agent Lookup and every verdict on this site still work from the published snapshot.</div>';
+      }
       setTimeout(connect, Math.min(30000, 2000 * 2 ** retry++));
     };
   }
