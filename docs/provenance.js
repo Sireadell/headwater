@@ -236,10 +236,38 @@ async function tracePayments(owner, raterIds, firstRatedAt, registeredAt) {
 // it stops paying its raters from the same wallet that registered the agent.
 // Only the funders actually seen at hop one are followed, so the second query
 // stays small.
-async function traceOwnerFunding(owner, raterIds) {
+// Splits review senders into the owner and everyone else. A smart wallet or a
+// contract can have its review sent, and paid for, by another address. When
+// that address is the agent's own owner, the review is the owner's, written
+// through a wallet that never paid for anything itself. `senders` maps a rater
+// to the set of addresses that sent its reviews, and holds only senders that
+// differ from the rater.
+function splitSenders(owner, senders) {
+  const ownerLc = (owner || "").toLowerCase();
+  const ownerSent = [];
+  const otherSenders = new Map();
+  for (const [rater, set] of senders || new Map()) {
+    if (rater === ownerLc) continue;
+    if (set.has(ownerLc)) ownerSent.push(rater);
+    const others = [...set].filter((a) => a !== ownerLc);
+    if (others.length > 0) otherSenders.set(rater, others);
+  }
+  return { ownerSent, otherSenders };
+}
+
+async function traceOwnerFunding(owner, raterIds, senders) {
   const ownerLc = (owner || "").toLowerCase();
   const raters = raterIds.map((r) => r.toLowerCase());
   const hop1 = await fundersOf(raters);
+  // Whoever sent and paid for a review stands in the funder position for it,
+  // so an owner who funded that sender is found at the second hop like any
+  // other intermediary. The owner itself sending is reported separately, as
+  // the owner's own review, not as funding.
+  const { otherSenders } = splitSenders(owner, senders);
+  for (const [rater, list] of otherSenders) {
+    if (!hop1.has(rater)) hop1.set(rater, []);
+    for (const sender of list) hop1.get(rater).push({ funder: sender, isDust: false, viaSender: true });
+  }
 
   const direct = [];
   const viaCandidates = new Map(); // intermediary -> raters it funded
@@ -281,7 +309,7 @@ async function traceOwnerFunding(owner, raterIds) {
 // paid for these raters" is checkable. "These reviews are fake" is a claim
 // about somebody's intent, is not checkable, and was wrong the one time this
 // project tried it.
-function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated, payments, rings, agentId }) {
+function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, selfRated, payments, rings, agentId, ownerSent }) {
   const findings = [];
   // Absent payment data is not the same as no payments, so an older caller
   // that does not supply it gets an empty record and no payment claim is made
@@ -357,6 +385,15 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
     );
   }
   if (selfRated > 0) findings.push("The owner's own wallet is among the raters.");
+  // Absent sender data makes no claim either way, same as payments and rings.
+  const proxied = ownerSent || [];
+  if (proxied.length > 0) {
+    findings.push(
+      `${proxied.length} rater wallet${proxied.length === 1 ? "" : "s"} did not send ${proxied.length === 1 ? "its" : "their"} ` +
+        "own review. This agent's owner sent and paid for the review transaction, so those reviews " +
+        "are the owner's, written through another address.",
+    );
+  }
   if (appRaters.length > 0) {
     findings.push(
       `${appRaters.length} of the ${raterTypes.sampled} raters checked are application contracts, not people. ` +
@@ -438,12 +475,20 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       findings,
     };
   }
-  if (selfRated > 0) {
+  if (selfRated > 0 || proxied.length > 0) {
     return {
       label: "SELF REVIEWED",
       tone: "red",
       summary:
-        "The wallet that owns this agent is among the wallets rating it.",
+        selfRated > 0
+          ? "The wallet that owns this agent is among the wallets rating it." +
+            (proxied.length > 0
+              ? ` It also sent ${proxied.length} more review${proxied.length === 1 ? "" : "s"} through other wallets.`
+              : "")
+          : `This agent's own owner sent ${proxied.length === 1 ? "the review" : `${proxied.length} of the reviews`} ` +
+            "on it, through a separate wallet that never paid for anything itself. Comparing the " +
+            "reviewer's address with the owner's address misses this, because the addresses differ. " +
+            "The transaction that carried the review shows who actually sent it.",
       findings,
     };
   }

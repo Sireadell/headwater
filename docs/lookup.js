@@ -17,6 +17,7 @@ query AgentLookup($agentId: String!) {
     feedbacks {
       id
       timestamp
+      txFrom
       reviewer {
         id
         distinctAgentCount
@@ -569,15 +570,22 @@ const PAGE = 1000;
 // after the rating.
 async function allReviewerIds(agentId, firstPage) {
   const firstRatedAt = new Map();
-  const note = (id, ts) => {
+  // Who sent each review, where that is not the reviewer itself.
+  const senders = new Map();
+  const note = (id, ts, txFrom) => {
     const key = (id || "").toLowerCase();
     const prev = firstRatedAt.get(key);
     if (prev === undefined || ts < prev) firstRatedAt.set(key, ts);
+    const from = (txFrom || "").toLowerCase();
+    if (from && from !== key) {
+      if (!senders.has(key)) senders.set(key, new Set());
+      senders.get(key).add(from);
+    }
   };
 
   if (firstPage.length < PAGE) {
-    for (const f of firstPage) note(f.reviewer.id, f.timestamp);
-    return { ids: firstPage.map((f) => f.reviewer.id), firstRatedAt };
+    for (const f of firstPage) note(f.reviewer.id, f.timestamp, f.txFrom);
+    return { ids: firstPage.map((f) => f.reviewer.id), firstRatedAt, senders };
   }
 
   // Past the cap, the nested list is thrown away rather than used as page one.
@@ -593,6 +601,7 @@ async function allReviewerIds(agentId, firstPage) {
          Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
            reviewer_id
            timestamp
+           txFrom
          }
        }`,
       { agentId, offset },
@@ -603,12 +612,12 @@ async function allReviewerIds(agentId, firstPage) {
     // prefix, so ids from either query dedupe against each other directly.
     for (const r of rows) {
       ids.push(r.reviewer_id);
-      note(r.reviewer_id, r.timestamp);
+      note(r.reviewer_id, r.timestamp, r.txFrom);
     }
-    if (rows.length < PAGE) return { ids, firstRatedAt };
+    if (rows.length < PAGE) return { ids, firstRatedAt, senders };
     // A malformed response that keeps returning full pages must not spin
     // forever against a public endpoint.
-    if (offset > 50000) return { ids, firstRatedAt };
+    if (offset > 50000) return { ids, firstRatedAt, senders };
   }
 }
 
@@ -634,7 +643,7 @@ async function checkAgent() {
     // list would send the same address to the query many times over.
     const ratings = agent
       ? await allReviewerIds(agentId, agent.feedbacks)
-      : { ids: [], firstRatedAt: new Map() };
+      : { ids: [], firstRatedAt: new Map(), senders: new Map() };
     const reviewerIds = Array.from(new Set(ratings.ids));
     // The signal fragments below were written for the handful of reviewers a
     // typical agent has, and one of them expands to a separate `_or` clause
@@ -673,7 +682,8 @@ async function checkAgent() {
     if (agent) {
       try {
         const raterAddrs = reviewerIds.map((id) => id.toLowerCase());
-        const funding = await traceOwnerFunding(agent.owner, raterAddrs);
+        const funding = await traceOwnerFunding(agent.owner, raterAddrs, ratings.senders);
+        const { ownerSent } = splitSenders(agent.owner, ratings.senders);
         const payments = await tracePayments(agent.owner, raterAddrs, ratings.firstRatedAt, agent.registeredAtTimestamp);
         const raterTypes = await classifyRaters(raterAddrs);
         const selfRated = raterAddrs.includes(agent.owner.toLowerCase()) ? 1 : 0;
@@ -701,6 +711,7 @@ async function checkAgent() {
             payments,
             rings,
             agentId: String(agentId),
+            ownerSent,
           }),
         };
       } catch (provErr) {

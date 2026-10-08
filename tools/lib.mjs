@@ -71,8 +71,8 @@ export async function graphql(query, variables, attempt = 0) {
 globalThis.graphql = graphql;
 
 const provenanceSrc = readFileSync(join(root, "docs/provenance.js"), "utf8");
-export const { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings } = new Function(
-  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings };`,
+export const { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings, splitSenders } = new Function(
+  `${provenanceSrc}\nreturn { classifyRaters, traceOwnerFunding, tracePayments, buildVerdict, findRings, splitSenders };`,
 )();
 
 const PAGE = 1000;
@@ -88,12 +88,15 @@ export async function ratersOf(agentId) {
   // costs nothing extra: it rides along on a query that was already being
   // made.
   const firstRatedAt = new Map();
+  // Who sent each review, where that is not the reviewer itself.
+  const senders = new Map();
   for (let offset = 0; ; offset += PAGE) {
     const data = await graphql(
       `query Raters($agentId: String!, $offset: Int!) {
          Feedback(where: { agent_id: { _eq: $agentId } }, limit: ${PAGE}, offset: $offset, order_by: { id: asc }) {
            reviewer_id
            timestamp
+           txFrom
          }
        }`,
       { agentId, offset },
@@ -104,11 +107,16 @@ export async function ratersOf(agentId) {
       ids.push(id);
       const prev = firstRatedAt.get(id);
       if (prev === undefined || r.timestamp < prev) firstRatedAt.set(id, r.timestamp);
+      const from = (r.txFrom || "").toLowerCase();
+      if (from && from !== id) {
+        if (!senders.has(id)) senders.set(id, new Set());
+        senders.get(id).add(from);
+      }
     }
     if (rows.length < PAGE) break;
     if (offset > 50000) break;
   }
-  return { raters: [...new Set(ids)], feedbackCount: ids.length, firstRatedAt };
+  return { raters: [...new Set(ids)], feedbackCount: ids.length, firstRatedAt, senders };
 }
 
 // Every rating, every rated agent's owner and every funding record behind
@@ -170,8 +178,9 @@ export async function checkAgent(agentId, { rings } = {}) {
   if (!agent) return null;
 
   const owner = agent.owner.toLowerCase();
-  const { raters, feedbackCount, firstRatedAt } = await ratersOf(String(agentId));
-  const funding = await traceOwnerFunding(owner, raters);
+  const { raters, feedbackCount, firstRatedAt, senders } = await ratersOf(String(agentId));
+  const funding = await traceOwnerFunding(owner, raters, senders);
+  const { ownerSent } = splitSenders(owner, senders);
   const payments = await tracePayments(owner, raters, firstRatedAt, agent.registeredAtTimestamp);
   const raterTypes = await classifyRaters(raters);
   const selfRated = raters.includes(owner) ? 1 : 0;
@@ -187,6 +196,7 @@ export async function checkAgent(agentId, { rings } = {}) {
     raterTypes,
     selfRated,
     payments,
+    ownerSent,
   });
   const ownerFundedSet = new Set([
     ...funding.direct.map((d) => d.rater),
@@ -206,6 +216,9 @@ export async function checkAgent(agentId, { rings } = {}) {
       feedbackCount,
       distinctRaters: raters.length,
       selfRated: selfRated === 1,
+      // Reviews whose transaction the owner sent from its own wallet, though
+      // the reviewer address is a different wallet.
+      sentByOwner: ownerSent.length,
       ownerFundedDirect: funding.direct.length,
       ownerFundedViaIntermediary: funding.indirect.length,
       intermediaries: [...new Set(funding.indirect.map((i) => i.via))],
