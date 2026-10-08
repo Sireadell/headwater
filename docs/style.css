@@ -258,3 +258,11 @@ a:hover { color: var(--accent-hover); }
 @media (max-width: 640px) {
   .prov-card { padding: 16px; }
 }
+
+.live-feed { display: flex; flex-direction: column; }
+.live-row { display: flex; gap: 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border, rgba(255,255,255,0.08)); font-size: 14px; flex-wrap: wrap; }
+.live-agent { min-width: 110px; }
+.live-who, .live-when { color: var(--text-mut); }
+.live-status { font-size: 12px; color: var(--text-faint); }
+.live-status.live-on { color: var(--green, #3ecf8e); }
+@media (max-width: 640px) { .live-row { gap: 8px; } }
