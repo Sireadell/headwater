@@ -136,6 +136,17 @@ The demo checks real Monad ERC-8004 agents and writes dated claims to:
 data/predictions.json
 ```
 
+### Alchemy for registry reads
+
+Headwater reads the ERC-8004 registries (agent owners and every reviewer of an agent) with plain `eth_call`. On Monad, Alchemy serves these reliably. With an Alchemy key set, those reads go through Alchemy:
+
+```bash
+echo ALCHEMY_API_KEY=your_key > .env
+node --env-file=.env scripts/demo.mjs
+```
+
+Without a key, Headwater falls back to the public Monad endpoint, which answered the same registry reads with 403 "Restricted JSON RPC method" when tested on 2026-10-08. Alchemy's free tier limits `eth_getLogs` to 10 blocks, so log scans stay on the public endpoints and the Envio index.
+
 ## Scoreboard
 
 Headwater keeps a record of the claims it has made.

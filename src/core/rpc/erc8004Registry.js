@@ -55,7 +55,9 @@ function getProvider() {
     // plain JsonRpcProvider against the first URL is enough for phase 2's
     // read-only volume; multi-endpoint failover can be added if a single
     // public endpoint proves unreliable in practice.
-    const url = config.monadRpcUrls[0] ?? 'https://rpc1.monad.xyz';
+    // Registry reads are plain eth_call, which Alchemy serves well, so use it
+    // when a key is set and fall back to the public endpoint otherwise.
+    const url = config.monadReadRpcUrl ?? config.monadRpcUrls[0] ?? 'https://rpc1.monad.xyz';
     providerInstance = new ethers.JsonRpcProvider(url, undefined, { staticNetwork: true });
   }
   return providerInstance;

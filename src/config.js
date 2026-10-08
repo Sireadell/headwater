@@ -11,6 +11,12 @@ export const config = {
     .split(',')
     .map((u) => u.trim())
     .filter(Boolean),
+  // Optional Alchemy endpoint for registry reads (eth_call, eth_getCode).
+  // Not used for eth_getLogs: Alchemy's free tier caps a log query at 10
+  // blocks, so log scans stay on the public endpoints above.
+  monadReadRpcUrl: process.env.ALCHEMY_API_KEY
+    ? `https://monad-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+    : undefined,
   monadMaxLookbackBlocks: Number(process.env.MONAD_MAX_LOOKBACK_BLOCKS) || 50_000,
   // How many blocks one funder-search "page" covers, see the
   // PAGE_BLOCK_SPAN comment in core/rpc/monadClient.js. Bigger finds
