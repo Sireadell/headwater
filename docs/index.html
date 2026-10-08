@@ -68,6 +68,28 @@
 
   <section class="finding">
     <div class="finding-head">
+      <h2 class="disp">Same agent, two readings</h2>
+      <a href="lookup.html?agent=182">See agent 182 &rarr;</a>
+    </div>
+    <div class="compare">
+      <div class="compare-card">
+        <div class="compare-src mono">QUICKNODE ERC-8004 EXPLORER</div>
+        <div class="compare-num mono disp">100<span>/100</span></div>
+        <div class="compare-label">sybil resistance, high confidence</div>
+        <p>Its sybil check divides unique reviewers by total reviews. Agent 182 has 7,665 reviews from 7,665 different wallets, so it scores perfectly. It does not look at who funded those wallets.</p>
+      </div>
+      <div class="compare-card compare-ours">
+        <div class="compare-src mono">HEADWATER</div>
+        <div class="compare-num mono disp">7,665<span>/7,665</span></div>
+        <div class="compare-label">reviewers paid by the agent&rsquo;s own owner</div>
+        <p>Each reviewer wallet got 11 MON from the owner, rated the agent, then sent about 10.93 MON back to that same owner. <span class="badge badge-red mono">ROUND TRIP</span></p>
+      </div>
+    </div>
+    <p class="footnote">Quicknode figures read from <a href="https://erc-8004.quicknode.com/agents/monad-mainnet/182">erc-8004.quicknode.com/agents/monad-mainnet/182</a> and its published <a href="https://erc-8004.quicknode.com/reputation-v1">formula v1.4</a> on 2026-10-08. Its overall score for agent 182 is 41, because it drops the review values for using an unlisted tag. The sybil part still reads as perfect. Both readings are correct about what they measure. Counting distinct wallets and asking where their money came from are different questions, and only the second one sees a campaign.</p>
+  </section>
+
+  <section class="finding">
+    <div class="finding-head">
       <h2 class="disp">What ERC-8004 reputation on Monad is actually made of</h2>
       <a href="lookup.html">Check any agent &rarr;</a>
     </div>

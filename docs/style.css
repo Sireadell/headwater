@@ -266,3 +266,16 @@ a:hover { color: var(--accent-hover); }
 .live-status { font-size: 12px; color: var(--text-faint); }
 .live-status.live-on { color: var(--green, #3ecf8e); }
 @media (max-width: 640px) { .live-row { gap: 8px; } }
+
+/* Same agent, two readings */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 22px 24px; }
+.compare-ours { border-color: rgba(229,72,77,0.45); }
+.compare-src { font-size: 11px; letter-spacing: 0.08em; color: var(--text-faint); }
+.compare-num { font-size: 40px; font-weight: 600; margin-top: 10px; line-height: 1; }
+.compare-num span { font-size: 18px; color: var(--text-mut); margin-left: 2px; }
+.compare-label { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+.compare-card p { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin: 14px 0 0; }
+.compare-card .badge { margin-left: 4px; }
+.footnote a { color: inherit; text-decoration: underline; }
+@media (max-width: 640px) { .compare { grid-template-columns: 1fr; } .compare-num { font-size: 32px; } }

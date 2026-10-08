@@ -684,6 +684,12 @@ document.getElementById("agentId").addEventListener("keydown", (e) => {
   if (e.key === "Enter") checkAgent();
 });
 
+// lookup.html?agent=182 opens straight on that agent.
+const linkedAgent = new URLSearchParams(location.search).get("agent");
+if (linkedAgent && /^\d+$/.test(linkedAgent)) {
+  document.getElementById("agentId").value = linkedAgent;
+}
+
 if (!GRAPHQL_ENDPOINT) {
   renderOffline();
 } else {
