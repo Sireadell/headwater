@@ -47,7 +47,7 @@ Headwater classifies agents with verdicts like:
 |---|---|
 | `NO EVIDENCE` | The agent has no rating history yet |
 | `THIN` | All ratings came from one address |
-| `SELF REVIEWED` | The owner's wallet is also a rater |
+| `SELF REVIEWED` | The owner's wallet is also a rater, or the owner sent a rater's review itself |
 | `APP GENERATED` | Ratings appear to come from application contracts |
 | `OWNER FUNDED` | The owner funded raters directly or through one hop |
 | `ROUND TRIP` | Funds moved from owner to rater, then back after rating |
