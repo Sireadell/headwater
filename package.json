@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Independent funding-provenance audit for ERC-8004 agent reputation on Monad. Monad Metropolis submission.",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "register:agent": "node scripts/register-headwater-agent.mjs"
   },
   "dependencies": {
     "ethers": "^6.17.0"

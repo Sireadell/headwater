@@ -1,0 +1,31 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Headwater",
+  "description": "ERC-8004 reputation context for Monad agents. Headwater explains what an agent reputation score is made of before another agent, wallet, or marketplace trusts it.",
+  "image": "https://sireadell.github.io/headwater/assets/logo.png",
+  "endpoints": [
+    {
+      "name": "lookup",
+      "endpoint": "https://sireadell.github.io/headwater/lookup.html"
+    },
+    {
+      "name": "api",
+      "endpoint": "https://sireadell.github.io/headwater/api/index.json"
+    },
+    {
+      "name": "mcp",
+      "endpoint": "https://github.com/Sireadell/headwater/tree/master/mcp"
+    }
+  ],
+  "registrations": [
+    {
+      "agentRegistry": "eip155:143:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+    }
+  ],
+  "supportedTrust": [
+    "reputation",
+    "provenance",
+    "mcp"
+  ],
+  "active": true
+}
