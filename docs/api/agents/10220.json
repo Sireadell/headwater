@@ -3,10 +3,11 @@
   "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
   "agentURI": "https://execution.market/workers/0x46bdfd8256ceeb3325725cb3b81701c3e2e32ebd",
   "registeredAt": 1787540225,
-  "verdict": "RING",
-  "tone": "amber",
-  "summary": "This agent's ratings trace to a group that also rated 11 other agents. Looked at alone, this agent's reviews seem ordinary. Looked at across the chain, the same money source sits behind all of them. That describes where the money and the ratings came from, not why, and a group of related agents can be perfectly legitimate. It does mean these reviews are not independent of each other.",
+  "verdict": "SELF REVIEWED",
+  "tone": "red",
+  "summary": "This agent's own owner sent the review on it, through a separate wallet that never paid for anything itself. Comparing the reviewer's address with the owner's address misses this, because the addresses differ. The transaction that carried the review shows who actually sent it.",
   "findings": [
+    "1 rater wallet did not send its own review. This agent's owner sent and paid for the review transaction, so that review is the owner's, written through another address.",
     "Every rating came from one single address.",
     "Wallet 0xd3868e1e... funded 13 raters that rated 12 agents, this one and 11 others. It is not this agent's owner, so a check that only follows the owner's money would miss it."
   ],
@@ -14,6 +15,7 @@
     "feedbackCount": 5,
     "distinctRaters": 1,
     "selfRated": false,
+    "sentByOwner": 1,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
@@ -57,6 +59,6 @@
     "codeCheckTotal": 1,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
-  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T12:06:19.799Z"
+  "source": "https://indexer.dev.hyperindex.xyz/24aaf5b/v1/graphql",
+  "generatedAt": "2026-10-08T19:44:15.419Z"
 }

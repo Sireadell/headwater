@@ -7,12 +7,14 @@
   "tone": "mut",
   "summary": "These scores were written by application contracts recording outcomes, not by people forming opinions. That is the standard being used as designed. It is not a warning, but the score measures results inside one application rather than a general reputation, and it should not be read as customers vouching for this agent.",
   "findings": [
+    "4 rater wallets did not send their own review. This agent's owner sent and paid for the review transaction, so those reviews are the owner's, written through another address.",
     "4 of the 5 raters checked are application contracts, not people. They expose createGame(uint256), games(uint256), getRound(uint256,uint256), so these scores are outcomes recorded by software."
   ],
   "evidence": {
     "feedbackCount": 10,
     "distinctRaters": 5,
     "selfRated": false,
+    "sentByOwner": 4,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
@@ -36,6 +38,6 @@
     "codeCheckTotal": 5,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
-  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T12:05:54.223Z"
+  "source": "https://indexer.dev.hyperindex.xyz/24aaf5b/v1/graphql",
+  "generatedAt": "2026-10-08T19:43:44.028Z"
 }

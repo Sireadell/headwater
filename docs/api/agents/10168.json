@@ -5,15 +5,17 @@
   "registeredAt": 1785008412,
   "verdict": "SELF REVIEWED",
   "tone": "red",
-  "summary": "The wallet that owns this agent is among the wallets rating it.",
+  "summary": "The wallet that owns this agent is among the wallets rating it. It also sent 3 more reviews through other wallets.",
   "findings": [
     "The owner's own wallet is among the raters.",
+    "3 rater wallets did not send their own review. This agent's owner sent and paid for the review transaction, so those reviews are the owner's, written through another address.",
     "Wallet 0xd3868e1e... funded 13 raters that rated 12 agents, this one and 11 others. It is not this agent's owner, so a check that only follows the owner's money would miss it."
   ],
   "evidence": {
     "feedbackCount": 4,
     "distinctRaters": 4,
     "selfRated": true,
+    "sentByOwner": 3,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
@@ -57,6 +59,6 @@
     "codeCheckTotal": 4,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
-  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T12:06:36.754Z"
+  "source": "https://indexer.dev.hyperindex.xyz/24aaf5b/v1/graphql",
+  "generatedAt": "2026-10-08T19:44:27.215Z"
 }

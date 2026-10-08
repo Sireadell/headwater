@@ -3,16 +3,18 @@
   "owner": "0x103040545ac5031a11e8c03dd11324c7333a13c7",
   "agentURI": "https://execution.market/workers/0x945659f0eb9c34487b0c0f61ed7e9d279ace8f09",
   "registeredAt": 1785008412,
-  "verdict": "THIN",
-  "tone": "amber",
-  "summary": "Every rating on this agent came from a single address. 75 of the 93 rated agents on Monad are in this position. One address agreeing with itself repeatedly is one opinion, however many times it is recorded.",
+  "verdict": "SELF REVIEWED",
+  "tone": "red",
+  "summary": "This agent's own owner sent the review on it, through a separate wallet that never paid for anything itself. Comparing the reviewer's address with the owner's address misses this, because the addresses differ. The transaction that carried the review shows who actually sent it.",
   "findings": [
+    "1 rater wallet did not send its own review. This agent's owner sent and paid for the review transaction, so that review is the owner's, written through another address.",
     "Every rating came from one single address."
   ],
   "evidence": {
     "feedbackCount": 1,
     "distinctRaters": 1,
     "selfRated": false,
+    "sentByOwner": 1,
     "ownerFundedDirect": 0,
     "ownerFundedViaIntermediary": 0,
     "intermediaries": [],
@@ -36,6 +38,6 @@
     "codeCheckTotal": 1,
     "note": "A verdict is a statement about where money came from, not about anyone's intent. Absence of a funding link is weaker evidence than a link, because funding moved by an internal contract call is not visible in top-level transactions."
   },
-  "source": "https://indexer.dev.hyperindex.xyz/d8750c2/v1/graphql",
-  "generatedAt": "2026-10-06T12:07:39.029Z"
+  "source": "https://indexer.dev.hyperindex.xyz/24aaf5b/v1/graphql",
+  "generatedAt": "2026-10-08T19:45:41.644Z"
 }

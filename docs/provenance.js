@@ -390,8 +390,8 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
   if (proxied.length > 0) {
     findings.push(
       `${proxied.length} rater wallet${proxied.length === 1 ? "" : "s"} did not send ${proxied.length === 1 ? "its" : "their"} ` +
-        "own review. This agent's owner sent and paid for the review transaction, so those reviews " +
-        "are the owner's, written through another address.",
+        `own review. This agent's owner sent and paid for the review transaction, so ${proxied.length === 1 ? "that review is" : "those reviews are"} ` +
+        "the owner's, written through another address.",
     );
   }
   if (appRaters.length > 0) {
@@ -515,7 +515,7 @@ function buildVerdict({ owner, reviewers, feedbackCount, funding, raterTypes, se
       label: "THIN",
       tone: "amber",
       summary:
-        "Every rating on this agent came from a single address. 75 of the 93 rated agents on " +
+        "Every rating on this agent came from a single address. 77 of the 95 rated agents on " +
         "Monad are in this position. One address agreeing with itself repeatedly is one " +
         "opinion, however many times it is recorded.",
       findings,
